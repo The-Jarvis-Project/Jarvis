@@ -92,4 +92,42 @@ namespace Jarvis.API
             bool quotes = false, bool trimSpace = true, bool header = true) =>
             Jarvis.mlContext.Data.LoadFromTextFile<T>(dataPath, ',', header, quotes, trimSpace);
     }
+
+    /// <summary>
+    /// Hard-Coded functions for getting attributes of JarvisRequests.
+    /// </summary>
+    public static class Requests
+    {
+        /// <summary>
+        /// Creates the request that is used internally when finding request attributes.
+        /// </summary>
+        /// <param name="request">The original request</param>
+        /// <returns>The raw request</returns>
+        public static JarvisRequest GetRaw(JarvisRequest request) =>
+            new JarvisRequest()
+            {
+                Id = request.Id,
+                Request = Raw(request)
+            };
+
+        /// <summary>
+        /// Tests if a request is most likely a question.
+        /// </summary>
+        /// <param name="request">The request to check</param>
+        /// <returns>Whether or not the request is most likely a question</returns>
+        public static bool IsQuestion(JarvisRequest request)
+        {
+            string raw = Raw(request);
+            return raw.Contains("?") ||
+                raw.StartsWith("who") ||
+                raw.StartsWith("what") ||
+                raw.StartsWith("why") ||
+                raw.StartsWith("where") ||
+                raw.StartsWith("when") ||
+                raw.StartsWith("which") ||
+                raw.StartsWith("how");
+        }
+
+        private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
+    }
 }

@@ -7,7 +7,7 @@ namespace Jarvis.Behaviors
 {
     public class TestJarvisWebBehavior : IWebUpdate, IStart
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         public int Priority => 100;
 
         private static readonly string dataPath = 
