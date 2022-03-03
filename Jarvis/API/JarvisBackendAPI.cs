@@ -128,6 +128,11 @@ namespace Jarvis.API
                 raw.StartsWith("how");
         }
 
+        public static bool HasKeywords(JarvisRequest request)
+        {
+            
+        }
+
         private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
     }
 }
