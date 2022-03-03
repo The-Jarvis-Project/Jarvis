@@ -128,11 +128,29 @@ namespace Jarvis.API
                 raw.StartsWith("how");
         }
 
-        public static bool HasKeywords(JarvisRequest request)
+        public static bool HasKeywords(JarvisRequest request, params string[] keywords)
         {
-            
+            string[] words = GetWords(request);
+            for (int i = 0; i < keywords.Length; i++)
+            {
+                bool hasKeyword = false;
+                for (int w = 0; w < words.Length; w++)
+                {
+                    if (keywords[i] == words[w])
+                    {
+                        hasKeyword = true;
+                        break;
+                    }
+                }
+                if (!hasKeyword) return false;
+            }
         }
 
         private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
+
+        private static string[] GetWords(JarvisRequest request)
+        {
+            string raw = Raw(request);
+        }
     }
 }
