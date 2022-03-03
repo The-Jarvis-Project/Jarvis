@@ -7,9 +7,6 @@ namespace Jarvis
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        public static void Main()
-        {
-            ServiceBase.Run(new Jarvis());
-        }
+        public static void Main() => ServiceBase.Run(new Jarvis());
     }
 }

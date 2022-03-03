@@ -9,13 +9,13 @@ namespace Jarvis.Behaviors
         public bool Enabled { get; set; } = false;
         public int Priority => 0;
 
-        private static readonly string dataPath = @"C:\Users\rex\Downloads\train.csv";
+        private static readonly string dataPath = @"C:\Users\rexjw\Downloads\yelp_labelled.txt";
 
         private JarvisMLModel model;
 
         public void Start()
         {
-            IDataView dataView = MLSystem.LoadCsv<HappinessData>(dataPath, true, true, true);
+            IDataView dataView = MLSystem.LoadTxt<HappinessData>(dataPath);
 
             IEstimator<ITransformer> estimator = Jarvis.mlContext.Transforms.Text.NormalizeText("FeaturesA", "SentimentText")
                 .Append(MLSystem.Featurize("FeaturesB", "FeaturesA"))

@@ -7,11 +7,11 @@ namespace Jarvis.Behaviors
 {
     public class TestJarvisWebBehavior : IWebUpdate, IStart
     {
-        public bool Enabled { get; set; } = false;
+        public bool Enabled { get; set; } = true;
         public int Priority => 100;
 
         private static readonly string dataPath = 
-            @"C:\Users\rex\Downloads\sentiment labelled sentences\sentiment labelled sentences\yelp_labelled.txt";
+            @"C:\Users\rexjw\Downloads\yelp_labelled.txt";
 
         public ITransformer model;
 
