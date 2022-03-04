@@ -236,6 +236,7 @@
     <Compile Include="API\Behaviors.cs" />
     <Compile Include="API\JarvisBackendAPI.cs" />
     <Compile Include="API\JarvisResponse.cs" />
+    <Compile Include="Behaviors\WeatherBehavior.cs" />
     <Compile Include="JarvisService.cs">
       <SubType>Component</SubType>
     </Compile>
