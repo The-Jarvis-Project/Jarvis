@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using System;
 using System.Diagnostics;
 
 namespace Jarvis.API
@@ -111,7 +112,7 @@ namespace Jarvis.API
             };
 
         /// <summary>
-        /// Tests if a request is most likely a question.
+        /// Tests if a request is most likely a question (Case Insensitive).
         /// </summary>
         /// <param name="request">The request to check</param>
         /// <returns>Whether or not the request is most likely a question</returns>
@@ -128,6 +129,12 @@ namespace Jarvis.API
                 raw.StartsWith("how");
         }
 
+        /// <summary>
+        /// Checks if a request has certain keywords, if it contains all of them it will return true (Case Insensitive).
+        /// </summary>
+        /// <param name="request">The request to check</param>
+        /// <param name="keywords">The keywords to check for</param>
+        /// <returns>Whether or not the request contains all the keywords</returns>
         public static bool HasKeywords(JarvisRequest request, params string[] keywords)
         {
             string[] words = GetWords(request);
@@ -144,13 +151,45 @@ namespace Jarvis.API
                 }
                 if (!hasKeyword) return false;
             }
+            return true;
         }
 
         private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
 
+        private static char[] separators = { ' ',
+        '.',
+        ',',
+        '?',
+        '!',
+        '\'',
+        '\"',
+        '<',
+        '>',
+        ':',
+        ';',
+        '[',
+        ']',
+        '{',
+        '}',
+        '~',
+        '`',
+        '+',
+        '|',
+        '=',
+        '(',
+        ')',
+        '$',
+        '@',
+        '#',
+        '%',
+        '*',
+        '\\',
+        '/' };
+
         private static string[] GetWords(JarvisRequest request)
         {
             string raw = Raw(request);
+            return raw.Split(separators, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }
