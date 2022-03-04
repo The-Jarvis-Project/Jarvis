@@ -156,7 +156,7 @@ namespace Jarvis.API
 
         private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
 
-        private static char[] separators = { ' ',
+        private readonly static char[] separators = { ' ',
         '.',
         ',',
         '?',
