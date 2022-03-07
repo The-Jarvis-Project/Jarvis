@@ -199,6 +199,7 @@
     </Reference>
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Device" />
     <Reference Include="System.Management" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
@@ -230,6 +231,7 @@
     <Compile Include="API\Simulation\Primitives.cs" />
     <Compile Include="API\Simulation\SimulationEngine.cs" />
     <Compile Include="API\Simulation\World.cs" />
+    <Compile Include="API\Utilities.cs" />
     <Compile Include="Behaviors\HappinessBehavior.cs" />
     <Compile Include="Behaviors\TestJarvisWebBehavior.cs" />
     <Compile Include="API\JarvisRequest.cs" />
