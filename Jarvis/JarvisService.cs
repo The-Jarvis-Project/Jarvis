@@ -69,6 +69,8 @@ namespace Jarvis
         private readonly List<IStart> startBehaviors;
         private readonly List<IStop> stopBehaviors;
 
+        private readonly List<object> hotLoadedBehaviors;
+
         /// <summary>
         /// The MLContext used for all Jarvis ML.Net machine learning functions.
         /// </summary>
@@ -134,6 +136,8 @@ namespace Jarvis
             requests = new List<JarvisRequest>();
             unfilledRequests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
+
+            hotLoadedBehaviors = new List<object>();
         }
 
         private int CompareBehaviors(IBehaviorBase x, IBehaviorBase y)
