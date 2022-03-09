@@ -15,6 +15,10 @@ using Microsoft.ML;
 
 namespace Jarvis
 {
+    /// <summary>
+    /// State of the Jarvis Windows service.
+    /// (Used Internally)
+    /// </summary>
     public enum ServiceState
     {
         SERVICE_STOPPED = 0x00000001,
@@ -26,6 +30,9 @@ namespace Jarvis
         SERVICE_PAUSED = 0x00000007,
     }
 
+    /// <summary>
+    /// (Used Internally)
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct ServiceStatus
     {
@@ -38,6 +45,9 @@ namespace Jarvis
         public int dwWaitHint;
     };
 
+    /// <summary>
+    /// The Jarvis Windows service class.  Contains critical functions.
+    /// </summary>
     public partial class Jarvis : ServiceBase
     {
         private const int updateMs = 100, logMs = 90000, webRequestMs = 2000;
@@ -59,8 +69,14 @@ namespace Jarvis
         private readonly List<IStart> startBehaviors;
         private readonly List<IStop> stopBehaviors;
 
+        /// <summary>
+        /// The MLContext used for all Jarvis ML.Net machine learning functions.
+        /// </summary>
         public static readonly MLContext mlContext = new MLContext(100);
 
+        /// <summary>
+        /// Create a new Jarvis service instance.
+        /// </summary>
         public Jarvis()
         {
             InitializeComponent();
