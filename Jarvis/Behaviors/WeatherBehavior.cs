@@ -1,9 +1,4 @@
 ﻿using Jarvis.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jarvis.Behaviors
 {
@@ -15,9 +10,14 @@ namespace Jarvis.Behaviors
         public void WebUpdate()
         {
             JarvisRequest[] requests = ComSystem.Requests();
-            if (requests.Length > 0)
+            for (int i = 0; i < requests.Length; i++)
             {
-                
+                if (Requests.IsQuestion(requests[i]) &&
+                    Requests.HasKeywords(requests[i], "weather"))
+                {
+                    string msg = "Receieved Weather Request";
+                    ComSystem.SendResponse(msg, ResponseType.Text, requests[i].Id);
+                }
             }
         }
     }
