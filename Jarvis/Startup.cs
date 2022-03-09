@@ -2,10 +2,13 @@
 
 namespace Jarvis
 {
-    public static class Program
+    /// <summary>
+    /// Wrapper for starting the Jarvis service
+    /// </summary>
+    public static class Startup
     {
         /// <summary>
-        /// The main entry point for the application.
+        /// Starts the Jarvis service.
         /// </summary>
         public static void Main() => ServiceBase.Run(new Jarvis());
     }

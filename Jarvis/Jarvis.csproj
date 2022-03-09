@@ -54,7 +54,7 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Jarvis.Program</StartupObject>
+    <StartupObject>Jarvis.Startup</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Stable|AnyCPU'">
     <OutputPath>C:\Jarvis\Stable\</OutputPath>
@@ -245,7 +245,7 @@
     <Compile Include="JarvisService.Designer.cs">
       <DependentUpon>JarvisService.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Startup.cs" />
     <Compile Include="JarvisInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
