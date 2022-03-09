@@ -4,7 +4,7 @@ namespace Jarvis.Behaviors
 {
     public class WeatherBehavior : IWebUpdate
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         public int Priority => 150;
 
         public void WebUpdate()

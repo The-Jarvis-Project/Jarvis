@@ -138,6 +138,10 @@ namespace Jarvis
             responses = new List<JarvisResponse>();
 
             hotLoadedBehaviors = new List<object>();
+            Assembly[] refed = AppDomain.CurrentDomain.GetAssemblies();
+            string referencedAssemblies = "Referenced Assemblies:";
+            for (int i = 0; i < refed.Length; i++) referencedAssemblies += "\n" + refed[i].GetName().Name;
+            eventLog.WriteEntry(referencedAssemblies, EventLogEntryType.Information, 9);
         }
 
         private int CompareBehaviors(IBehaviorBase x, IBehaviorBase y)
@@ -331,7 +335,7 @@ namespace Jarvis
         }
 
         /// <summary>
-        /// Link to low level Jarvis service functions
+        /// Link to low level Jarvis service functions.
         /// </summary>
         public static class Service
         {
@@ -357,6 +361,9 @@ namespace Jarvis
             /// <summary>
             /// Trys to send a response for a specified JarvisRequest.
             /// </summary>
+            /// <param name="data">The data of the request</param>
+            /// <param name="type">The data type of the request</param>
+            /// <param name="requestId">The id of the request</param>
             /// <returns>If the reponse was sent successfully</returns>
             public static async Task<bool> TrySendResponse(string data, string type, long requestId)
             {
@@ -382,6 +389,36 @@ namespace Jarvis
                     }
                 }
                 return false;
+            }
+
+            /// <summary>
+            /// (Used internally for hot loading custom behaviors).
+            /// </summary>
+            public static class HotLoading
+            {
+                /// <summary>
+                /// Updates a function because the start loop has already completed.
+                /// </summary>
+                /// <param name="obj">The function to add</param>
+                public static void UpdateStartBehavior(IStart obj) => obj.Start();
+
+                /// <summary>
+                /// Adds a function to the stop loop.
+                /// </summary>
+                /// <param name="obj">The function to add</param>
+                public static void AddToStopBehaviors(IStop obj) => singleton.stopBehaviors.Add(obj);
+
+                /// <summary>
+                /// Adds a function to the main update loop.
+                /// </summary>
+                /// <param name="obj">The function to add</param>
+                public static void AddToUpdateBehaviors(IUpdate obj) => singleton.updateBehaviors.Add(obj);
+
+                /// <summary>
+                /// Adds a function to the web update loop.
+                /// </summary>
+                /// <param name="obj">The function to add</param>
+                public static void AddToWebBehaviors(IWebUpdate obj) => singleton.webBehaviors.Add(obj);
             }
         }
     }

@@ -233,6 +233,7 @@
     <Compile Include="API\Simulation\World.cs" />
     <Compile Include="API\Utilities.cs" />
     <Compile Include="BuiltInBehaviors\HappinessBehavior.cs" />
+    <Compile Include="BuiltInBehaviors\TestHotBehaviorBehavior.cs" />
     <Compile Include="BuiltInBehaviors\TestJarvisWebBehavior.cs" />
     <Compile Include="API\JarvisRequest.cs" />
     <Compile Include="API\Behaviors.cs" />
