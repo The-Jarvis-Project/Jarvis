@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Device.Location;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jarvis.API
 {
@@ -19,7 +15,5 @@ namespace Jarvis.API
             watcher.Dispose();
             return (0, 0);
         }
-
-        
     }
 }
