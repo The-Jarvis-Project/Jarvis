@@ -186,51 +186,29 @@ namespace Jarvis.API
         }
 
         /// <summary>
-        /// Lowercases and trims a request.
-        /// </summary>
-        /// <param name="request">The request to convert</param>
-        /// <returns>A raw string of the request's data</returns>
-        private static string Raw(JarvisRequest request) => request.Request.ToLower().Trim();
-
-        /// <summary>
-        /// Separator characters used for separating out words in a request.
-        /// </summary>
-        private readonly static char[] separators = { ' ',
-        '.',
-        ',',
-        '?',
-        '!',
-        '\'',
-        '\"',
-        '<',
-        '>',
-        ':',
-        ';',
-        '[',
-        ']',
-        '{',
-        '}',
-        '~',
-        '`',
-        '+',
-        '|',
-        '=',
-        '(',
-        ')',
-        '$',
-        '@',
-        '#',
-        '%',
-        '*',
-        '\\',
-        '/' };
-
-        /// <summary>
         /// Gets the raw words in a request.
         /// </summary>
         /// <param name="request">The request to split up</param>
         /// <returns>All of the raw words in the request</returns>
         private static string[] GetWords(JarvisRequest request) =>
-            Raw(request).Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            Raw(request).Split(Word.separators, StringSplitOptions.RemoveEmptyEntries);
+
+        /// <summary>
+        /// Lowercases and trims a request.
+        /// </summary>
+        /// <param name="request">The request to convert</param>
+        /// <returns>A raw string of the request's data</returns>
+        private static string Raw(JarvisRequest request) => Polish(request).Request.ToLower().Trim();
+
+        /// <summary>
+        /// Removes irrelevant characters from the request.
+        /// </summary>
+        /// <param name="request">The request to fix</param>
+        /// <returns>The cleaned up request</returns>
+        public static JarvisRequest Polish(JarvisRequest request)
+        {
+            request.Request = request.Request.Replace(Environment.NewLine, "\n");
+            return request;
+        }
     }
 }

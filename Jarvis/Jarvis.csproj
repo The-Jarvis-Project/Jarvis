@@ -232,13 +232,14 @@
     <Compile Include="API\Simulation\SimulationEngine.cs" />
     <Compile Include="API\Simulation\World.cs" />
     <Compile Include="API\Utilities.cs" />
-    <Compile Include="Behaviors\HappinessBehavior.cs" />
-    <Compile Include="Behaviors\TestJarvisWebBehavior.cs" />
+    <Compile Include="BuiltInBehaviors\HappinessBehavior.cs" />
+    <Compile Include="BuiltInBehaviors\TestJarvisWebBehavior.cs" />
     <Compile Include="API\JarvisRequest.cs" />
     <Compile Include="API\Behaviors.cs" />
     <Compile Include="API\JarvisBackendAPI.cs" />
     <Compile Include="API\JarvisResponse.cs" />
-    <Compile Include="Behaviors\WeatherBehavior.cs" />
+    <Compile Include="BuiltInBehaviors\WeatherBehavior.cs" />
+    <Compile Include="API\LanguageAPI.cs" />
     <Compile Include="JarvisService.cs">
       <SubType>Component</SubType>
     </Compile>
