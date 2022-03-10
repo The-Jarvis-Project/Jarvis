@@ -91,10 +91,7 @@ namespace Jarvis.Behaviors
                     }
                 }
             }
-            else if (cmd.Command == Command.wipe)
-            {
-                await ComSystem.WipeDatabase();
-            }
+            else if (cmd.Command == Command.wipe) await ComSystem.WipeDatabase();
         }
     }
 }
