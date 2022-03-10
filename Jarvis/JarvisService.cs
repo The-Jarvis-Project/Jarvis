@@ -394,12 +394,6 @@ namespace Jarvis
             public static class HotLoading
             {
                 /// <summary>
-                /// Updates a function because the start loop has already completed.
-                /// </summary>
-                /// <param name="obj">The function to add</param>
-                public static void UpdateStartBehavior(IStart obj) => obj.Start();
-
-                /// <summary>
                 /// Adds a function to the stop loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
@@ -428,6 +422,8 @@ namespace Jarvis
                     singleton.webBehaviors.Add(obj);
                     singleton.webBehaviors.Sort(singleton.CompareBehaviors);
                 }
+
+                public static void RemoveFromStop
             }
         }
     }

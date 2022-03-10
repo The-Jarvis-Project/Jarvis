@@ -18,6 +18,8 @@ namespace Jarvis.Behaviors
         private readonly bool hasStart = false, hasStop = false,
             hasUpdate = false, hasWebUpdate = false;
 
+        public string Name { get; }
+
         /// <summary>
         /// Loads a behavior from a file and stores the instance here.
         /// </summary>
@@ -25,6 +27,7 @@ namespace Jarvis.Behaviors
         /// <param name="behaviorName">The full name of the behavior class</param>
         public HotBehavior(string filePath, string behaviorName)
         {
+            Name = behaviorName;
             Dictionary<string, string> providerOptions = new Dictionary<string, string>
             {
                 { "CompilerVersion", "v4.0" },
