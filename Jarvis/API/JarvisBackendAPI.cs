@@ -1,6 +1,7 @@
 ﻿using Microsoft.ML;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Jarvis.API
 {
@@ -47,7 +48,7 @@ namespace Jarvis.API
         /// <param name="msg">Response message</param>
         /// <param name="type">Response message value type, ex. floating point</param>
         /// <param name="requestId">Id property of the JarvisRequest</param>
-        public static async void SendResponse(string msg, ResponseType type, long requestId)
+        public static async Task SendResponse(string msg, ResponseType type, long requestId)
         {
             string typeCode;
             switch (type)
@@ -75,7 +76,7 @@ namespace Jarvis.API
         /// <summary>
         /// Wipes the JarvisLinker database of all requests and responses.
         /// </summary>
-        public static async void WipeDatabase()
+        public static async Task WipeDatabase()
         {
             bool result = await Jarvis.Service.TryWipeDatabase();
             if (!result) Log.Warning("Failed to delete all items from JarvisLinker.");
