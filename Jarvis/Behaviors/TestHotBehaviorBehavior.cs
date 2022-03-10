@@ -2,7 +2,7 @@
 {
     public class TestHotBehaviorBehavior : IStart
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         public int Priority => 200;
 
         public void Start()

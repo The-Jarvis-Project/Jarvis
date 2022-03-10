@@ -15,10 +15,31 @@ namespace Jarvis.Behaviors
         private readonly Assembly compiledAssembly;
         private readonly object behaviorInstance;
         private readonly Type type;
-        private readonly bool hasStart = false, hasStop = false,
-            hasUpdate = false, hasWebUpdate = false;
 
+        /// <summary>
+        /// The name of the behavior that was loaded.
+        /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// This behavior has an IStart function.
+        /// </summary>
+        public bool HasStart { get; }
+
+        /// <summary>
+        /// This behavior has an IStop function.
+        /// </summary>
+        public bool HasStop { get; }
+
+        /// <summary>
+        /// This behavior has an IUpdate function.
+        /// </summary>
+        public bool HasUpdate { get; }
+
+        /// <summary>
+        /// This behavior has an IWebUpdate function.
+        /// </summary>
+        public bool HasWebUpdate { get; }
 
         /// <summary>
         /// Loads a behavior from a file and stores the instance here.
@@ -66,22 +87,22 @@ namespace Jarvis.Behaviors
                 if (type.GetInterface(nameof(IStart)) != null)
                 {
                     hasStart = true;
-                    Jarvis.Service.HotLoading.UpdateStartBehavior(type as IStart);
+                    (type as IStart).Start();
                 }
                 if (type.GetInterface(nameof(IStop)) != null)
                 {
                     hasStop = true;
-                    Jarvis.Service.HotLoading.AddToStopBehaviors(type as IStop);
+                    Jarvis.Service.HotLoading.AddToStopBehaviors(behaviorName, type as IStop);
                 }
                 if (type.GetInterface(nameof(IUpdate)) != null)
                 {
                     hasUpdate = true;
-                    Jarvis.Service.HotLoading.AddToUpdateBehaviors(type as IUpdate);
+                    Jarvis.Service.HotLoading.AddToUpdateBehaviors(behaviorName, type as IUpdate);
                 }
                 if (type.GetInterface(nameof(IWebUpdate)) != null)
                 {
                     hasWebUpdate = true;
-                    Jarvis.Service.HotLoading.AddToWebBehaviors(type as IWebUpdate);
+                    Jarvis.Service.HotLoading.AddToWebBehaviors(behaviorName, type as IWebUpdate);
                 }
 
                 string loadedText = "Loaded " + type.Name +

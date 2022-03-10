@@ -69,6 +69,11 @@ namespace Jarvis
         private readonly List<IStart> startBehaviors;
         private readonly List<IStop> stopBehaviors;
 
+        private readonly List<string> updateNames;
+        private readonly List<string> webNames;
+        private readonly List<string> startNames;
+        private readonly List<string> stopNames;
+
         /// <summary>
         /// The MLContext used for all Jarvis ML.Net machine learning functions.
         /// </summary>
@@ -97,6 +102,10 @@ namespace Jarvis
             webBehaviors = new List<IWebUpdate>();
             startBehaviors = new List<IStart>();
             stopBehaviors = new List<IStop>();
+            updateNames = new List<string>();
+            webNames = new List<string>();
+            startNames = new List<string>();
+            stopNames = new List<string>();
             Type[] types = Assembly.GetExecutingAssembly().GetTypes();
             for (int i = 0; i < types.Length; i++)
             {
@@ -397,8 +406,9 @@ namespace Jarvis
                 /// Adds a function to the stop loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToStopBehaviors(IStop obj)
+                public static void AddToStopBehaviors(string name, IStop obj)
                 {
+                    singleton.stopNames.Add(name);
                     singleton.stopBehaviors.Add(obj);
                     singleton.stopBehaviors.Sort(singleton.CompareBehaviors);
                 }
@@ -407,8 +417,9 @@ namespace Jarvis
                 /// Adds a function to the main update loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToUpdateBehaviors(IUpdate obj)
+                public static void AddToUpdateBehaviors(string name, IUpdate obj)
                 {
+                    singleton.updateNames.Add(name);
                     singleton.updateBehaviors.Add(obj);
                     singleton.updateBehaviors.Sort(singleton.CompareBehaviors);
                 }
@@ -417,13 +428,63 @@ namespace Jarvis
                 /// Adds a function to the web update loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToWebBehaviors(IWebUpdate obj)
+                public static void AddToWebBehaviors(string name, IWebUpdate obj)
                 {
+                    singleton.webNames.Add(name);
                     singleton.webBehaviors.Add(obj);
                     singleton.webBehaviors.Sort(singleton.CompareBehaviors);
                 }
 
-                public static void RemoveFromStop
+                /// <summary>
+                /// Removes a behavior from the stop loop.
+                /// </summary>
+                /// <param name="name">The name of the behavior to remove</param>
+                public static void RemoveFromStop(string name)
+                {
+                    for (int i = 0; i < singleton.stopNames.Count; i++)
+                    {
+                        if (singleton.stopNames[i] == name)
+                        {
+                            singleton.stopBehaviors.RemoveAt(i);
+                            singleton.stopNames.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+
+                /// <summary>
+                /// Removes a behavior from the update loop.
+                /// </summary>
+                /// <param name="name">The name of the behavior to remove</param>
+                public static void RemoveFromUpdate(string name)
+                {
+                    for (int i = 0; i < singleton.updateNames.Count; i++)
+                    {
+                        if (singleton.updateNames[i] == name)
+                        {
+                            singleton.updateBehaviors.RemoveAt(i);
+                            singleton.updateNames.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+
+                /// <summary>
+                /// Removes a behavior from the web update loop.
+                /// </summary>
+                /// <param name="name">The name of the behavior to remove</param>
+                public static void RemoveFromWeb(string name)
+                {
+                    for (int i = 0; i < singleton.webNames.Count; i++)
+                    {
+                        if (singleton.webNames[i] == name)
+                        {
+                            singleton.webBehaviors.RemoveAt(i);
+                            singleton.webNames.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
             }
         }
     }

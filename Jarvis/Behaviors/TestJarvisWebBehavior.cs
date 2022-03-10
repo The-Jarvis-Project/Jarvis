@@ -10,8 +10,7 @@ namespace Jarvis.Behaviors
         public bool Enabled { get; set; } = false;
         public int Priority => 100;
 
-        private static readonly string dataPath = 
-            @"C:\Users\rexjw\Downloads\yelp_labelled.txt";
+        private static readonly string dataPath = @"C:\Users\rexjw\Downloads\yelp_labelled.txt";
 
         public ITransformer model;
 

@@ -1,9 +1,6 @@
 ﻿using Jarvis.API;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jarvis.Behaviors
 {
@@ -40,13 +37,8 @@ namespace Jarvis.Behaviors
         {
             JarvisRequest[] requests = ComSystem.Requests();
             for (int i = 0; i < requests.Length; i++)
-            {
                 if (requests[i].Request.StartsWith("--"))
-                {
-                    CommandLine cmdLine = GetCommandLine(requests[i]);
-                    
-                }
-            }
+                    ProcessCommandLine(GetCommandLine(requests[i]), requests[i].Id);
         }
 
         private CommandLine GetCommandLine(JarvisRequest request)
@@ -62,13 +54,18 @@ namespace Jarvis.Behaviors
             return new CommandLine(cmd, args);
         }
 
-        private void ProcessCommandLine(CommandLine cmd)
+        private void ProcessCommandLine(CommandLine cmd, long requestId)
         {
-            if (cmd.Command == Command.kill) Jarvis.Service.ForceStop();
+            if (cmd.Command == Command.kill)
+            {
+                Jarvis.Service.ForceStop();
+                ComSystem.SendResponse("[kill] Killing Jarvis service", ResponseType.Text, requestId);
+            }
             else if (cmd.Command == Command.loadb)
             {
                 HotBehavior behavior = new HotBehavior(cmd.Args[0], cmd.Args[1]);
                 hotLoadedBehaviors.Add(behavior);
+                ComSystem.SendResponse("[loadb] Loaded " + behavior.Name, ResponseType.Text, requestId);
             }
             else if (cmd.Command == Command.unloadb)
             {
@@ -76,7 +73,14 @@ namespace Jarvis.Behaviors
                 {
                     if (hotLoadedBehaviors[i].Name == cmd.Args[0])
                     {
+                        if (hotLoadedBehaviors[i].HasStop)
+                            Jarvis.Service.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
+                        if (hotLoadedBehaviors[i].HasUpdate)
+                            Jarvis.Service.HotLoading.RemoveFromUpdate(hotLoadedBehaviors[i].Name);
+                        if (hotLoadedBehaviors[i].HasWebUpdate)
+                            Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
                         hotLoadedBehaviors.RemoveAt(i);
+                        i--;
                     }
                 }
             }
