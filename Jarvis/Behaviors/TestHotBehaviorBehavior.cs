@@ -1,6 +1,4 @@
-﻿using Jarvis.Behaviors;
-
-namespace Jarvis.BuiltInBehaviors
+﻿namespace Jarvis.Behaviors
 {
     public class TestHotBehaviorBehavior : IStart
     {

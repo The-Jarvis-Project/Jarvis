@@ -69,8 +69,6 @@ namespace Jarvis
         private readonly List<IStart> startBehaviors;
         private readonly List<IStop> stopBehaviors;
 
-        private readonly List<object> hotLoadedBehaviors;
-
         /// <summary>
         /// The MLContext used for all Jarvis ML.Net machine learning functions.
         /// </summary>
@@ -137,7 +135,6 @@ namespace Jarvis
             unfilledRequests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
 
-            hotLoadedBehaviors = new List<object>();
             Assembly[] refed = AppDomain.CurrentDomain.GetAssemblies();
             string referencedAssemblies = "Referenced Assemblies:";
             for (int i = 0; i < refed.Length; i++) referencedAssemblies += "\n" + refed[i].GetName().Name;
@@ -406,19 +403,31 @@ namespace Jarvis
                 /// Adds a function to the stop loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToStopBehaviors(IStop obj) => singleton.stopBehaviors.Add(obj);
+                public static void AddToStopBehaviors(IStop obj)
+                {
+                    singleton.stopBehaviors.Add(obj);
+                    singleton.stopBehaviors.Sort(singleton.CompareBehaviors);
+                }
 
                 /// <summary>
                 /// Adds a function to the main update loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToUpdateBehaviors(IUpdate obj) => singleton.updateBehaviors.Add(obj);
+                public static void AddToUpdateBehaviors(IUpdate obj)
+                {
+                    singleton.updateBehaviors.Add(obj);
+                    singleton.updateBehaviors.Sort(singleton.CompareBehaviors);
+                }
 
                 /// <summary>
                 /// Adds a function to the web update loop.
                 /// </summary>
                 /// <param name="obj">The function to add</param>
-                public static void AddToWebBehaviors(IWebUpdate obj) => singleton.webBehaviors.Add(obj);
+                public static void AddToWebBehaviors(IWebUpdate obj)
+                {
+                    singleton.webBehaviors.Add(obj);
+                    singleton.webBehaviors.Sort(singleton.CompareBehaviors);
+                }
             }
         }
     }

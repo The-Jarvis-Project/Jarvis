@@ -7,7 +7,7 @@ namespace Jarvis.Behaviors
     public class HappinessBehavior : IStart, IWebUpdate
     {
         public bool Enabled { get; set; } = false;
-        public int Priority => 0;
+        public int Priority => 10;
 
         private static readonly string dataPath = @"C:\Users\rexjw\Downloads\yelp_labelled.txt";
 
