@@ -478,6 +478,12 @@ namespace Jarvis
                     singleton.webBehaviors.Sort(singleton.CompareBehaviors);
                 }
 
+                /*public static void AddToWebBehaviors(string name, PropertyInfo enabled, MethodInfo method, object obj)
+                {
+                    bool isEnabled = (bool)enabled.GetValue(obj);
+                    singleton.hotWebBehaviors.Add((name, isEnabled, method, obj));
+                }*/
+
                 /// <summary>
                 /// Removes a behavior from the stop loop.
                 /// </summary>

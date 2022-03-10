@@ -87,22 +87,22 @@ namespace Jarvis.Behaviors
                 if (type.GetInterface(nameof(IStart)) != null)
                 {
                     HasStart = true;
-                    (type as IStart).Start();
+                    (behaviorInstance as IStart).Start();
                 }
                 if (type.GetInterface(nameof(IStop)) != null)
                 {
                     HasStop = true;
-                    Jarvis.Service.HotLoading.AddToStopBehaviors(behaviorName, type as IStop);
+                    Jarvis.Service.HotLoading.AddToStopBehaviors(behaviorName, behaviorInstance as IStop);
                 }
                 if (type.GetInterface(nameof(IUpdate)) != null)
                 {
                     HasUpdate = true;
-                    Jarvis.Service.HotLoading.AddToUpdateBehaviors(behaviorName, type as IUpdate);
+                    Jarvis.Service.HotLoading.AddToUpdateBehaviors(behaviorName, behaviorInstance as IUpdate);
                 }
                 if (type.GetInterface(nameof(IWebUpdate)) != null)
                 {
                     HasWebUpdate = true;
-                    Jarvis.Service.HotLoading.AddToWebBehaviors(behaviorName, type as IWebUpdate);
+                    Jarvis.Service.HotLoading.AddToWebBehaviors(behaviorName, behaviorInstance as IWebUpdate);
                 }
 
                 string loadedText = "Loaded " + type.Name +
