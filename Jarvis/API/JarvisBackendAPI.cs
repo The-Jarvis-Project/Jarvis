@@ -71,6 +71,15 @@ namespace Jarvis.API
         /// </summary>
         /// <returns>Unfilled requests</returns>
         public static JarvisRequest[] Requests() => Jarvis.Service.GetUnfilledRequests().ToArray();
+
+        /// <summary>
+        /// Wipes the JarvisLinker database of all requests and responses.
+        /// </summary>
+        public static async void WipeDatabase()
+        {
+            bool result = await Jarvis.Service.TryWipeDatabase();
+            if (!result) Log.Warning("Failed to delete all items from JarvisLinker.");
+        }
     }
 
     /// <summary>

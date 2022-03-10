@@ -340,6 +340,30 @@ namespace Jarvis
             return (await client.PostAsync(responseUrl, jsonContent)).IsSuccessStatusCode;
         }
 
+        private async Task<bool> ClearRequests()
+        {
+            bool isSuccess = true;
+            for (int i = 0; i < requests.Count; i++)
+            {
+                string delUrl = requestUrl + "/" + requests[i].Id;
+                bool success = (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
+                if (!success) success = false;
+            }
+            return isSuccess;
+        }
+
+        private async Task<bool> ClearResponses()
+        {
+            bool isSuccess = true;
+            for (int i = 0; i < responses.Count; i++)
+            {
+                string delUrl = responseUrl + "/" + responses[i].Id;
+                bool success = (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
+                if (!success) success = false;
+            }
+            return isSuccess;
+        }
+
         /// <summary>
         /// Link to low level Jarvis service functions.
         /// </summary>
@@ -396,6 +420,17 @@ namespace Jarvis
                     }
                 }
                 return false;
+            }
+
+            /// <summary>
+            /// Trys to clear all the requests and responses from JarvisLinker.
+            /// </summary>
+            /// <returns>Whether or not all the requests and responses were deleted</returns>
+            public static async Task<bool> TryWipeDatabase()
+            {
+                bool requestsDel = await singleton.ClearRequests();
+                bool responsesDel = await singleton.ClearResponses();
+                return requestsDel && responsesDel;
             }
 
             /// <summary>

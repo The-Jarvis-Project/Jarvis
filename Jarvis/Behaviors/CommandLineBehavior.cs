@@ -47,7 +47,7 @@ namespace Jarvis.Behaviors
             for (int i = 0; i < split.Length; i++) split[i] = split[i].Trim();
 
             Command cmd;
-            string cmdArg = split[0].ToLower();
+            string cmdArg = split[0].ToLower().Replace("--", string.Empty);
             cmd = (Command)Enum.Parse(typeof(Command), cmdArg);
             string[] args = new string[split.Length - 1];
             for (int i = 0; i < args.Length; i++) args[i] = split[i + 1];
@@ -58,8 +58,9 @@ namespace Jarvis.Behaviors
         {
             if (cmd.Command == Command.kill)
             {
+                ComSystem.SendResponse("[kill] Killing Jarvis service and wiping database", ResponseType.Text, requestId);
+                ComSystem.WipeDatabase();
                 Jarvis.Service.ForceStop();
-                ComSystem.SendResponse("[kill] Killing Jarvis service", ResponseType.Text, requestId);
             }
             else if (cmd.Command == Command.loadb)
             {
@@ -80,6 +81,8 @@ namespace Jarvis.Behaviors
                         if (hotLoadedBehaviors[i].HasWebUpdate)
                             Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
                         hotLoadedBehaviors.RemoveAt(i);
+                        ComSystem.SendResponse("[unloadb] Unload " + hotLoadedBehaviors[i].Name,
+                            ResponseType.Text, requestId);
                         i--;
                     }
                 }
