@@ -9,7 +9,6 @@ namespace Jarvis.API
     /// </summary>
     public class JarvisMLModel
     {
-
         /// <summary>
         /// Model type.
         /// </summary>
@@ -25,6 +24,14 @@ namespace Jarvis.API
         private readonly Type type;
         private bool trained;
 
+        /// <summary>
+        /// Creates a JarvisMLModel that can be used to create and utilize neural networks and regressions.
+        /// </summary>
+        /// <param name="data">The data to base the model off of</param>
+        /// <param name="estimator">Estimator used for the model</param>
+        /// <param name="type">Type of machine learning model</param>
+        /// <param name="majorColumnName">The major column name of the processed data</param>
+        /// <param name="testPercent">The percentage of the data to test against</param>
         public JarvisMLModel(IDataView data, IEstimator<ITransformer> estimator, Type type,
             string majorColumnName = "Label", double testPercent = 0.2)
         {
@@ -128,9 +135,20 @@ namespace Jarvis.API
         /// </summary>
         public class BinaryPrediction
         {
+            /// <summary>
+            /// The prediction made.
+            /// </summary>
             [ColumnName("PredictedLabel")]
             public bool Prediction { get; set; }
+
+            /// <summary>
+            /// Probability the prediction is correct.
+            /// </summary>
             public float Probability { get; set; }
+
+            /// <summary>
+            /// Score when evaluated in the model.
+            /// </summary>
             public float Score { get; set; }
         }
 

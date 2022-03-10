@@ -350,6 +350,7 @@ namespace Jarvis
             /// </summary>
             /// <param name="msg">Log message</param>
             /// <param name="type">Type of log message</param>
+            /// <param name="code">Number code of the log message</param>
             public static void Log(string msg, EventLogEntryType type = EventLogEntryType.Information, int code = 8) =>
                 singleton.eventLog.WriteEntry(msg, type, code);
 
@@ -398,13 +399,14 @@ namespace Jarvis
             }
 
             /// <summary>
-            /// (Used internally for hot loading custom behaviors).
+            /// (Used internally for hot loading custom behaviors.)
             /// </summary>
             public static class HotLoading
             {
                 /// <summary>
                 /// Adds a function to the stop loop.
                 /// </summary>
+                /// <param name="name">Name of the behavior</param>
                 /// <param name="obj">The function to add</param>
                 public static void AddToStopBehaviors(string name, IStop obj)
                 {
@@ -416,6 +418,7 @@ namespace Jarvis
                 /// <summary>
                 /// Adds a function to the main update loop.
                 /// </summary>
+                /// <param name="name">Name of the behavior</param>
                 /// <param name="obj">The function to add</param>
                 public static void AddToUpdateBehaviors(string name, IUpdate obj)
                 {
@@ -427,6 +430,7 @@ namespace Jarvis
                 /// <summary>
                 /// Adds a function to the web update loop.
                 /// </summary>
+                /// <param name="name">Name of the behavior</param>
                 /// <param name="obj">The function to add</param>
                 public static void AddToWebBehaviors(string name, IWebUpdate obj)
                 {
