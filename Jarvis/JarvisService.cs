@@ -176,9 +176,10 @@ namespace Jarvis
                     if (startBehaviors[i].Enabled)
                         startBehaviors[i].Start();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                eventLog.WriteEntry("Error On Start: " + e.Message, EventLogEntryType.Error, 9);
+                eventLog.WriteEntry("Error On Start: " + ex.Message + "\n\n" +
+                    ex.Source + "\n\n" + ex.Data + "\n\n" + ex.StackTrace, EventLogEntryType.Error, 9);
             }
 
             updateTimer = new Timer(updateMs);
@@ -217,9 +218,10 @@ namespace Jarvis
                     if (stopBehaviors[i].Enabled)
                         stopBehaviors[i].Stop();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                eventLog.WriteEntry("Error On Stop: " + e.Message, EventLogEntryType.Error, 10);
+                eventLog.WriteEntry("Error On Stop: " + ex.Message + "\n\n" +
+                    ex.Source + "\n\n" + ex.Data + "\n\n" + ex.StackTrace, EventLogEntryType.Error, 10);
             }
             eventLog.WriteEntry("Stopped", EventLogEntryType.Information, 2);
 
@@ -278,7 +280,8 @@ namespace Jarvis
             }
             catch (Exception ex)
             {
-                eventLog.WriteEntry("Error On Update: " + ex.Message, EventLogEntryType.Error, 11);
+                eventLog.WriteEntry("Error On Update: " + ex.Message + "\n\n" +
+                    ex.Source + "\n\n" + ex.Data + "\n\n" + ex.StackTrace, EventLogEntryType.Error, 11);
             }
         }
 
@@ -310,7 +313,8 @@ namespace Jarvis
                 }
                 catch (Exception ex)
                 {
-                    eventLog.WriteEntry("Error On WebUpdate: " + ex.Message, EventLogEntryType.Error, 12);
+                    eventLog.WriteEntry("Error On WebUpdate: " + ex.Message + "\n\n" + 
+                        ex.Source + "\n\n" + ex.Data + "\n\n" + ex.StackTrace, EventLogEntryType.Error, 12);
                 }
             }
             else eventLog.WriteEntry("Web Update Failed\nCode: " + requestMsg.StatusCode.ToString(), EventLogEntryType.Warning, 7);
@@ -347,7 +351,7 @@ namespace Jarvis
             {
                 string delUrl = requestUrl + "/" + requests[i].Id;
                 bool success = (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
-                if (!success) success = false;
+                if (!success) isSuccess = false;
             }
             return isSuccess;
         }
@@ -359,7 +363,7 @@ namespace Jarvis
             {
                 string delUrl = responseUrl + "/" + responses[i].Id;
                 bool success = (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
-                if (!success) success = false;
+                if (!success) isSuccess = false;
             }
             return isSuccess;
         }
