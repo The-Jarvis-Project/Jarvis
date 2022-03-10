@@ -11,7 +11,7 @@ namespace Jarvis.Behaviors
 
         private enum Command
         {
-            kill, loadb, unloadb
+            none, kill, load, unload, wipe
         }
 
         private struct CommandLine
@@ -43,7 +43,7 @@ namespace Jarvis.Behaviors
 
         private CommandLine GetCommandLine(JarvisRequest request)
         {
-            string[] split = request.Request.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] split = request.Request.Split('?');
             for (int i = 0; i < split.Length; i++) split[i] = split[i].Trim();
 
             Command cmd;
@@ -62,13 +62,17 @@ namespace Jarvis.Behaviors
                 await ComSystem.WipeDatabase();
                 Jarvis.Service.ForceStop();
             }
-            else if (cmd.Command == Command.loadb)
+            else if (cmd.Command == Command.load)
             {
-                HotBehavior behavior = new HotBehavior(cmd.Args[0], cmd.Args[1]);
-                hotLoadedBehaviors.Add(behavior);
-                await ComSystem.SendResponse("[loadb] Loaded " + behavior.Name, ResponseType.Text, requestId);
+                if (cmd.Args.Length == 2 && cmd.Args[0].EndsWith(".cs"))
+                {
+                    HotBehavior behavior = new HotBehavior(cmd.Args[0], cmd.Args[1]);
+                    hotLoadedBehaviors.Add(behavior);
+                    await ComSystem.SendResponse("[load] Loaded " + behavior.Name, ResponseType.Text, requestId);
+                }
+                else await ComSystem.SendResponse("[load] Invalid arguments!", ResponseType.Text, requestId);
             }
-            else if (cmd.Command == Command.unloadb)
+            else if (cmd.Command == Command.unload)
             {
                 for (int i = 0; i < hotLoadedBehaviors.Count; i++)
                 {
@@ -81,11 +85,15 @@ namespace Jarvis.Behaviors
                         if (hotLoadedBehaviors[i].HasWebUpdate)
                             Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
                         hotLoadedBehaviors.RemoveAt(i);
-                        await ComSystem.SendResponse("[unloadb] Unload " + hotLoadedBehaviors[i].Name,
+                        await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
                             ResponseType.Text, requestId);
                         i--;
                     }
                 }
+            }
+            else if (cmd.Command == Command.wipe)
+            {
+                await ComSystem.WipeDatabase();
             }
         }
     }
