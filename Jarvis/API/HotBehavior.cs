@@ -86,28 +86,28 @@ namespace Jarvis.Behaviors
             {
                 if (type.GetInterface(nameof(IStart)) != null)
                 {
-                    hasStart = true;
+                    HasStart = true;
                     (type as IStart).Start();
                 }
                 if (type.GetInterface(nameof(IStop)) != null)
                 {
-                    hasStop = true;
+                    HasStop = true;
                     Jarvis.Service.HotLoading.AddToStopBehaviors(behaviorName, type as IStop);
                 }
                 if (type.GetInterface(nameof(IUpdate)) != null)
                 {
-                    hasUpdate = true;
+                    HasUpdate = true;
                     Jarvis.Service.HotLoading.AddToUpdateBehaviors(behaviorName, type as IUpdate);
                 }
                 if (type.GetInterface(nameof(IWebUpdate)) != null)
                 {
-                    hasWebUpdate = true;
+                    HasWebUpdate = true;
                     Jarvis.Service.HotLoading.AddToWebBehaviors(behaviorName, type as IWebUpdate);
                 }
 
                 string loadedText = "Loaded " + type.Name +
-                    " with active behaviors:\nStart: " + hasStart + "\nStop: " + hasStop +
-                    "\nUpdate: " + hasUpdate + "\nWebUpdate: " + hasWebUpdate;
+                    " with active behaviors:\nStart: " + HasStart + "\nStop: " + HasStop +
+                    "\nUpdate: " + HasUpdate + "\nWebUpdate: " + HasWebUpdate;
                 Log.Info(loadedText);
             }
         }
