@@ -1,6 +1,8 @@
-﻿using Microsoft.ML;
+﻿using Jarvis.Behaviors;
+using Microsoft.ML;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Jarvis.API
@@ -219,6 +221,42 @@ namespace Jarvis.API
         {
             request.Request = request.Request.Replace(Environment.NewLine, "\n");
             return request;
+        }
+    }
+
+    /// <summary>
+    /// Class for getting a behavior's personal files.
+    /// </summary>
+    public static class FileSystem
+    {
+        public static string GetFileText<T>(T behavior, string fileName) where T : IBehaviorBase
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory,
+                behaviorDir = baseDir + @"\Behaviors\" + behavior.GetType().Name,
+                file = behaviorDir + "\\" + fileName;
+            if (!Directory.Exists(behaviorDir)) Directory.CreateDirectory(behaviorDir);
+            if (!File.Exists(file)) return null;
+            return File.ReadAllText(file);
+        }
+
+        public static byte[] GetFileRaw<T>(T behavior, string fileName) where T : IBehaviorBase
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory,
+                behaviorDir = baseDir + @"\Behaviors\" + behavior.GetType().Name,
+                file = behaviorDir + "\\" + fileName;
+            if (!Directory.Exists(behaviorDir)) Directory.CreateDirectory(behaviorDir);
+            if (!File.Exists(file)) return null;
+            return File.ReadAllBytes(file);
+        }
+
+        public static bool ClearFiles<T>(T behavior) where T : IBehaviorBase
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory,
+                behaviorDir = baseDir + @"\Behaviors\" + behavior.GetType().Name;
+            if (!Directory.Exists(behaviorDir)) return false;
+            string[] files = Directory.GetFiles(behaviorDir);
+            for (int i = 0; i < files.Length; i++) File.Delete(files[i]);
+            return true;
         }
     }
 }
