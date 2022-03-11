@@ -76,7 +76,7 @@ namespace Jarvis.Behaviors
             {
                 for (int i = 0; i < hotLoadedBehaviors.Count; i++)
                 {
-                    if (hotLoadedBehaviors[i].Name == cmd.Args[0])
+                    if (cmd.Args.Length > 0 && hotLoadedBehaviors[i].Name == cmd.Args[0])
                     {
                         if (hotLoadedBehaviors[i].HasStop)
                             Jarvis.Service.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
