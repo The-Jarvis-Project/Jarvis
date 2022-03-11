@@ -110,6 +110,7 @@ namespace Jarvis.Behaviors
                     "\nUpdate: " + HasUpdate + "\nWebUpdate: " + HasWebUpdate;
                 Log.Info(loadedText);
             }
+            codeProvider.Dispose();
         }
     }
 }

@@ -217,6 +217,8 @@ namespace Jarvis
                 for (int i = 0; i < stopBehaviors.Count; i++)
                     if (stopBehaviors[i].Enabled)
                         stopBehaviors[i].Stop();
+
+                client.Dispose();
             }
             catch (Exception ex)
             {
