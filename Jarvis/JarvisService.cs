@@ -292,21 +292,22 @@ namespace Jarvis
                 responseMsg = await client.GetAsync(responseUrl);
             if (requestMsg.IsSuccessStatusCode && responseMsg.IsSuccessStatusCode)
             {
-                requestsJson = await requestMsg.Content.ReadAsStringAsync();
-                responsesJson = await responseMsg.Content.ReadAsStringAsync();
-                requests = JsonConvert.DeserializeObject<List<JarvisRequest>>(requestsJson);
-                responses = JsonConvert.DeserializeObject<List<JarvisResponse>>(responsesJson);
-
-                unfilledRequests.Clear();
-                HashSet<long> filledRequests = new HashSet<long>();
-                for (int i = 0; i < responses.Count; i++)
-                    if (!filledRequests.Contains(responses[i].RequestId))
-                        filledRequests.Add(responses[i].RequestId);
-                for (int i = 0; i < requests.Count; i++)
-                    if (!filledRequests.Contains(requests[i].Id))
-                        unfilledRequests.Add(requests[i]);
                 try
                 {
+                    requestsJson = await requestMsg.Content.ReadAsStringAsync();
+                    responsesJson = await responseMsg.Content.ReadAsStringAsync();
+                    requests = JsonConvert.DeserializeObject<List<JarvisRequest>>(requestsJson);
+                    responses = JsonConvert.DeserializeObject<List<JarvisResponse>>(responsesJson);
+
+                    unfilledRequests.Clear();
+                    HashSet<long> filledRequests = new HashSet<long>();
+                    for (int i = 0; i < responses.Count; i++)
+                        if (!filledRequests.Contains(responses[i].RequestId))
+                            filledRequests.Add(responses[i].RequestId);
+                    for (int i = 0; i < requests.Count; i++)
+                        if (!filledRequests.Contains(requests[i].Id))
+                            unfilledRequests.Add(requests[i]);
+
                     for (int i = 0; i < webBehaviors.Count; i++)
                         if (webBehaviors[i].Enabled)
                             webBehaviors[i].WebUpdate();

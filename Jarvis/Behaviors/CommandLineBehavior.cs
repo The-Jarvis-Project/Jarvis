@@ -78,15 +78,34 @@ namespace Jarvis.Behaviors
                 {
                     if (cmd.Args.Length > 0 && hotLoadedBehaviors[i].Name == cmd.Args[0])
                     {
+                        Log.Warning(hotLoadedBehaviors[i].Name + " is being removed");
                         if (hotLoadedBehaviors[i].HasStop)
+                        {
                             Jarvis.Service.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
+                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from stop");
+                        }
                         if (hotLoadedBehaviors[i].HasUpdate)
+                        {
                             Jarvis.Service.HotLoading.RemoveFromUpdate(hotLoadedBehaviors[i].Name);
+                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from update");
+                        }
                         if (hotLoadedBehaviors[i].HasWebUpdate)
+                        {
                             Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
+                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from web update");
+                        }
                         hotLoadedBehaviors.RemoveAt(i);
-                        await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
-                            ResponseType.Text, requestId);
+                        Log.Warning(hotLoadedBehaviors[i].Name + " removed");
+                        try
+                        {
+                            await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
+                                ResponseType.Text, requestId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex.Message);
+                        }
+                        Log.Warning(hotLoadedBehaviors[i].Name + " sent response");
                         i--;
                     }
                 }
