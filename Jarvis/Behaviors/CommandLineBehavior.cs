@@ -82,23 +82,23 @@ namespace Jarvis.Behaviors
                         if (hotLoadedBehaviors[i].HasStop)
                         {
                             Jarvis.Service.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
-                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from stop");
+                            Log.Warning(hotLoadedBehaviors[i].Name + " removed from stop");
                         }
                         if (hotLoadedBehaviors[i].HasUpdate)
                         {
                             Jarvis.Service.HotLoading.RemoveFromUpdate(hotLoadedBehaviors[i].Name);
-                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from update");
+                            Log.Warning(hotLoadedBehaviors[i].Name + " removed from update");
                         }
                         if (hotLoadedBehaviors[i].HasWebUpdate)
                         {
                             Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
-                            Log.Warning(hotLoadedBehaviors[i].Name + " remove from web update");
+                            Log.Warning(hotLoadedBehaviors[i].Name + " removed from web update");
                         }
                         hotLoadedBehaviors.RemoveAt(i);
                         Log.Warning(hotLoadedBehaviors[i].Name + " removed");
                         try
                         {
-                            await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
+                            await = ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
                                 ResponseType.Text, requestId);
                         }
                         catch (Exception ex)

@@ -82,6 +82,8 @@ namespace Jarvis.Behaviors
             compiledAssembly = results.CompiledAssembly;
             behaviorInstance = compiledAssembly.CreateInstance(behaviorName);
             type = behaviorInstance.GetType();
+            Log.Info("Hot Behavior Type: " + type.FullName);
+
             if (type.IsClass && !type.IsAbstract)
             {
                 if (type.GetInterface(nameof(IStart)) != null)
