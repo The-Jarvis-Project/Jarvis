@@ -15,7 +15,7 @@ namespace Jarvis.Behaviors
         public void WebUpdate()
         {
             string fileTxt = FileSystem.GetFileText(this, "TextJarvisFile.txt");
-            Log.Info(fileTxt);
+            Log.Info("Test File Text: " + fileTxt);
         }
     }
 }
