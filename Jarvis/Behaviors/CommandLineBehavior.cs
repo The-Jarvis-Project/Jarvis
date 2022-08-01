@@ -98,7 +98,7 @@ namespace Jarvis.Behaviors
                         Log.Warning(hotLoadedBehaviors[i].Name + " removed");
                         try
                         {
-                            await = ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
+                            await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
                                 ResponseType.Text, requestId);
                         }
                         catch (Exception ex)
