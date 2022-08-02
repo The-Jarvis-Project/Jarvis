@@ -167,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\JarvisMLModel.cs" />
+    <Compile Include="API\MLSystem.cs" />
     <Compile Include="API\Simulation\Bounds.cs" />
     <Compile Include="API\Simulation\Primitives.cs" />
     <Compile Include="API\Simulation\SimulationEngine.cs" />
