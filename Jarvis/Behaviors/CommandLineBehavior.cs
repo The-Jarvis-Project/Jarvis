@@ -58,7 +58,8 @@ namespace Jarvis.Behaviors
         {
             if (cmd.Command == Command.kill)
             {
-                await ComSystem.SendResponse("[kill] Killing Jarvis service and wiping database", ResponseType.Text, requestId);
+                await ComSystem.SendResponse("[kill] Killing Jarvis service and wiping database", 
+                    "Jarvis", requestId);
                 await ComSystem.WipeDatabase();
                 Jarvis.Service.ForceStop();
             }
@@ -68,9 +69,9 @@ namespace Jarvis.Behaviors
                 {
                     HotBehavior behavior = new HotBehavior(cmd.Args[0], cmd.Args[1]);
                     hotLoadedBehaviors.Add(behavior);
-                    await ComSystem.SendResponse("[load] Loaded " + behavior.Name, ResponseType.Text, requestId);
+                    await ComSystem.SendResponse("[load] Loaded " + behavior.Name, "Jarvis", requestId);
                 }
-                else await ComSystem.SendResponse("[load] Invalid arguments!", ResponseType.Text, requestId);
+                else await ComSystem.SendResponse("[load] Invalid arguments!", "Jarvis", requestId);
             }
             else if (cmd.Command == Command.unload)
             {
@@ -99,7 +100,7 @@ namespace Jarvis.Behaviors
                         try
                         {
                             await ComSystem.SendResponse("[unload] Unload " + hotLoadedBehaviors[i].Name,
-                                ResponseType.Text, requestId);
+                                "Jarvis", requestId);
                         }
                         catch (Exception ex)
                         {

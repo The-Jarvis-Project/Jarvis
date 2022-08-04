@@ -11,9 +11,9 @@
         public long Id { get; set; }
 
         /// <summary>
-        /// The data type of the response.
+        /// Where this response originated from.
         /// </summary>
-        public string Type { get; set; }
+        public string Origin { get; set; }
 
         /// <summary>
         /// The data of the response.
@@ -32,9 +32,9 @@
     public class JarvisResponseDTO
     {
         /// <summary>
-        /// The data type of the response.
+        /// Where this response originated from.
         /// </summary>
-        public string Type { get; set; }
+        public string Origin { get; set; }
 
         /// <summary>
         /// The data of the response.

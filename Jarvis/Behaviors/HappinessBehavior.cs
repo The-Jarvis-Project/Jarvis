@@ -41,7 +41,7 @@ namespace Jarvis.Behaviors
                 Log.Warning(happy.Probability.ToString());
                 if (happy.Prediction) msg = "Happy";
                 else msg = "Sad";
-                _ = ComSystem.SendResponse(msg, ResponseType.Text, requests[0].Id);
+                _ = ComSystem.SendResponse(msg, "Jarvis", requests[0].Id);
             }
         }
 

@@ -334,11 +334,11 @@ namespace Jarvis
             eventLog.WriteEntry(log, EventLogEntryType.Information, 5);
         }
 
-        private async Task<bool> SendResponse(string data, string type, long requestId)
+        private async Task<bool> SendResponse(string data, string origin, long requestId)
         {
             JarvisResponseDTO dto = new JarvisResponseDTO
             {
-                Type = type,
+                Origin = origin,
                 Data = data,
                 RequestId = requestId
             };
@@ -400,10 +400,10 @@ namespace Jarvis
             /// Trys to send a response for a specified JarvisRequest.
             /// </summary>
             /// <param name="data">The data of the request</param>
-            /// <param name="type">The data type of the request</param>
+            /// <param name="origin">The origin of the response</param>
             /// <param name="requestId">The id of the request</param>
             /// <returns>If the reponse was sent successfully</returns>
-            public static async Task<bool> TrySendResponse(string data, string type, long requestId)
+            public static async Task<bool> TrySendResponse(string data, string origin, long requestId)
             {
                 bool canSend = false;
                 int requestIndex = -1;
@@ -419,7 +419,7 @@ namespace Jarvis
 
                 if (canSend)
                 {
-                    bool completed = await singleton.SendResponse(data, type, requestId);
+                    bool completed = await singleton.SendResponse(data, origin, requestId);
                     if (completed)
                     {
                         singleton.unfilledRequests.RemoveAt(requestIndex);

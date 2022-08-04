@@ -31,14 +31,6 @@ namespace Jarvis.API
     }
 
     /// <summary>
-    /// Data type for JarvisResponse.
-    /// </summary>
-    public enum ResponseType
-    {
-        Text, Int, Float
-    }
-
-    /// <summary>
     /// System for communicating with JarvisLinker.
     /// </summary>
     public static class ComSystem
@@ -47,25 +39,12 @@ namespace Jarvis.API
         /// Sends a response back to JarvisLinker from a request.
         /// </summary>
         /// <param name="msg">Response message</param>
-        /// <param name="type">Response message value type, ex. floating point</param>
+        /// <param name="origin">Response origin</param>
         /// <param name="requestId">Id property of the JarvisRequest</param>
-        public static async Task SendResponse(string msg, ResponseType type, long requestId)
+        public static async Task SendResponse(string msg, string origin, long requestId)
         {
-            string typeCode;
-            switch (type)
-            {
-                case ResponseType.Int:
-                    typeCode = "int";
-                    break;
-                case ResponseType.Float:
-                    typeCode = "float";
-                    break;
-                default:
-                    typeCode = "text";
-                    break;
-            }
-            bool result = await Jarvis.Service.TrySendResponse(msg, typeCode, requestId);
-            if (!result) Log.Warning("Failed to send response.\nRequestId: " + requestId + "\nType: " + type.ToString());
+            bool result = await Jarvis.Service.TrySendResponse(msg, origin, requestId);
+            if (!result) Log.Warning("Failed to send response.\nRequestId: " + requestId + "\nOrigin: " + origin);
         }
 
         /// <summary>

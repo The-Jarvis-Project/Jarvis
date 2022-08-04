@@ -58,7 +58,7 @@ namespace Jarvis.Behaviors
                 else msg = "Negative";
                 msg += "    Probability: " + (prediction.Probability * 100);
 
-                _ = ComSystem.SendResponse(msg, ResponseType.Text, requests[0].Id);
+                _ = ComSystem.SendResponse(msg, "Jarvis", requests[0].Id);
             }
             if (model == null) Log.Warning("null model");
         }
