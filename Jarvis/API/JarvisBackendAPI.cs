@@ -48,7 +48,7 @@ namespace Jarvis.API
             if (!result) Log.Warning("Failed to send response.\nRequestId: " + requestId + "\nOrigin: " + origin);
         }
 
-        public static async Task SendBladeResponse(string data, string origin) =>
+        public static async Task SendBladeRequest(string data, string origin) =>
             throw new NotImplementedException();
 
         /// <summary>
