@@ -18,7 +18,7 @@ namespace Jarvis.API.Lang
         public Word[] Words { get; }
 
         /// <summary>
-        /// Creates a new phrase object and decompiles the words.
+        /// Creates a new phrase object and breaks down the words.
         /// </summary>
         /// <param name="phrase">The actual phrase string</param>
         public Phrase(string phrase)

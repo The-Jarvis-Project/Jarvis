@@ -44,7 +44,7 @@ namespace Jarvis.API.Lang
         /// <summary>
         /// Create a setence object and compute the parts of the sentence.
         /// </summary>
-        /// <param name="sentence">The sentence to decompile</param>
+        /// <param name="sentence">The sentence to break down</param>
         public Sentence(string sentence)
         {
             Text = sentence;

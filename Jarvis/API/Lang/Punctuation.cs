@@ -32,7 +32,7 @@
         public Usage Use { get; }
 
         /// <summary>
-        /// Where the punctuation mark is in thi sentence.
+        /// Where the punctuation mark is in the sentence.
         /// </summary>
         public Location Loc { get; }
 
