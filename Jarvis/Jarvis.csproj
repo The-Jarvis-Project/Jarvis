@@ -167,6 +167,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\JarvisMLModel.cs" />
+    <Compile Include="API\Lang\Phrase.cs" />
+    <Compile Include="API\Lang\Punctuation.cs" />
+    <Compile Include="API\Lang\Sentence.cs" />
+    <Compile Include="API\Lang\StringComp.cs" />
+    <Compile Include="API\Lang\Word.cs" />
     <Compile Include="API\MLSystem.cs" />
     <Compile Include="API\Simulation\Bounds.cs" />
     <Compile Include="API\Simulation\Primitives.cs" />
@@ -182,7 +187,6 @@
     <Compile Include="API\JarvisBackendAPI.cs" />
     <Compile Include="API\JarvisResponse.cs" />
     <Compile Include="Behaviors\WeatherBehavior.cs" />
-    <Compile Include="API\LanguageAPI.cs" />
     <Compile Include="API\HotBehavior.cs" />
     <Compile Include="JarvisService.cs">
       <SubType>Component</SubType>
