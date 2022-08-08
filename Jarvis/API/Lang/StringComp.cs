@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Jarvis.API.Lang
 {
     /// <summary>
-    /// A broken down representation of a JarvisRequest's data into logical pieces.
+    /// A broken down representation of a string's data into logical pieces.
     /// </summary>
     public class StringComp
     {
