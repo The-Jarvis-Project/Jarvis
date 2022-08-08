@@ -166,6 +166,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\BladeMsg.cs" />
     <Compile Include="API\JarvisMLModel.cs" />
     <Compile Include="API\Lang\Phrase.cs" />
     <Compile Include="API\Lang\Punctuation.cs" />

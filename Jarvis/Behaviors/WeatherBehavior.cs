@@ -16,7 +16,7 @@ namespace Jarvis.Behaviors
                     Requests.HasKeywords(requests[i], "weather"))
                 {
                     string msg = "Receieved Weather Request";
-                    _ = ComSystem.SendResponse(msg, "Jarvis", requests[i].Id);
+                    _ = ComSystem.SendJarvisResponse(msg, "Jarvis", requests[i].Id);
                 }
             }
         }

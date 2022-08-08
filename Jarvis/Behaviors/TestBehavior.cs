@@ -21,7 +21,7 @@ namespace Jarvis.Behaviors
             {
                 if (Requests.HasKeywords(requests[i], "music", "play"))
                 {
-                    _ = ComSystem.SendResponse("Playing Music", "Jarvis", requests[i].Id);
+                    _ = ComSystem.SendJarvisResponse("Playing Music", "Jarvis", requests[i].Id);
                 }
             }
         }
