@@ -9,29 +9,29 @@ namespace Jarvis.API.Lang
     public class StringComp
     {
         /// <summary>
-        /// The original request object this decompiled request is linked to.
+        /// The original text of the string.
         /// </summary>
         public string Text { get; }
 
         /// <summary>
-        /// The sentences in this request's text.
+        /// The sentences in this string's text.
         /// </summary>
         public Sentence[] Sentences { get; }
 
         /// <summary>
-        /// The phrases in this request's text.
+        /// The phrases in this string's text.
         /// </summary>
         public Phrase[] Phrases { get; }
 
         /// <summary>
-        /// The words in this request's text.
+        /// The words in this string's text.
         /// </summary>
         public Word[] Words { get; }
 
         /// <summary>
-        /// Create a new Decompiled String object.  Finds sentences, phrases, words, and punctuation.
+        /// Create a new String Composition object.  Finds sentences, phrases, words, and punctuation.
         /// </summary>
-        /// <param name="text">The text to decompile</param>
+        /// <param name="text">The text to break down</param>
         public StringComp(string text)
         {
             Text = text;
