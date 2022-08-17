@@ -322,25 +322,17 @@ namespace Jarvis
                     List<BladeMsg> bladeCmdList = JsonConvert.DeserializeObject<List<BladeMsg>>(bladeCmdsJson),
                         bladeResponseList = JsonConvert.DeserializeObject<List<BladeMsg>>(bladeResponsesJson);
 
+                    bladeCmds.Clear();
+                    bladeResponses.Clear();
                     for (int i = 0; i < bladeCmdList.Count; i++)
                     {
-                        if (trackedBlades.Contains(bladeCmdList[i].Origin))
-                            bladeCmds[bladeCmdList[i].Origin] = bladeCmdList[i];
-                        else
-                        {
-                            Service.TrackBlade(bladeCmdList[i].Origin);
-                            bladeCmds[bladeCmdList[i].Origin] = bladeCmdList[i];
-                        }
+                        Service.TrackBlade(bladeCmdList[i].Origin);
+                        bladeCmds.Add(bladeCmdList[i].Origin, bladeCmdList[i]);
                     }
                     for (int i = 0; i < bladeResponseList.Count; i++)
                     {
-                        if (trackedBlades.Contains(bladeResponseList[i].Origin))
-                            bladeResponses[bladeResponseList[i].Origin] = bladeResponseList[i];
-                        else
-                        {
-                            Service.TrackBlade(bladeResponseList[i].Origin);
-                            bladeResponses[bladeResponseList[i].Origin] = bladeResponseList[i];
-                        }
+                        Service.TrackBlade(bladeResponseList[i].Origin);
+                        bladeResponses.Add(bladeResponseList[i].Origin, bladeResponseList[i]);
                     }
 
 
@@ -529,16 +521,6 @@ namespace Jarvis
                 if (!singleton.trackedBlades.Contains(blade))
                 {
                     singleton.trackedBlades.Add(blade);
-                    singleton.bladeCmds.Add(blade, new BladeMsg()
-                    {
-                        Origin = blade,
-                        Data = "--postblade",
-                    });
-                    singleton.bladeResponses.Add(blade, new BladeMsg()
-                    {
-                        Origin = blade,
-                        Data = string.Empty,
-                    });
                     singleton.bladeCmdQueue.Add(blade, new Queue<BladeMsg>());
                     return true;
                 }
