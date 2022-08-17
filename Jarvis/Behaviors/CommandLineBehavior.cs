@@ -11,7 +11,7 @@ namespace Jarvis.Behaviors
 
         private enum Command
         {
-            none, kill, load, unload, wipe
+            none, kill, load, unload, wipe, postblade
         }
 
         private struct CommandLine
@@ -58,7 +58,7 @@ namespace Jarvis.Behaviors
         {
             if (cmd.Command == Command.kill)
             {
-                await ComSystem.SendJarvisResponse("[kill] Killing Jarvis service and wiping database", 
+                await ComSystem.SendJarvisResponse("[kill] Killing Jarvis service and wiping database",
                     "Jarvis", requestId);
                 await ComSystem.WipeDatabase();
                 Jarvis.Service.ForceStop();
@@ -82,17 +82,17 @@ namespace Jarvis.Behaviors
                         Log.Warning(hotLoadedBehaviors[i].Name + " is being removed");
                         if (hotLoadedBehaviors[i].HasStop)
                         {
-                            Jarvis.Service.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
+                            Jarvis.HotLoading.RemoveFromStop(hotLoadedBehaviors[i].Name);
                             Log.Warning(hotLoadedBehaviors[i].Name + " removed from stop");
                         }
                         if (hotLoadedBehaviors[i].HasUpdate)
                         {
-                            Jarvis.Service.HotLoading.RemoveFromUpdate(hotLoadedBehaviors[i].Name);
+                            Jarvis.HotLoading.RemoveFromUpdate(hotLoadedBehaviors[i].Name);
                             Log.Warning(hotLoadedBehaviors[i].Name + " removed from update");
                         }
                         if (hotLoadedBehaviors[i].HasWebUpdate)
                         {
-                            Jarvis.Service.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
+                            Jarvis.HotLoading.RemoveFromWeb(hotLoadedBehaviors[i].Name);
                             Log.Warning(hotLoadedBehaviors[i].Name + " removed from web update");
                         }
                         hotLoadedBehaviors.RemoveAt(i);

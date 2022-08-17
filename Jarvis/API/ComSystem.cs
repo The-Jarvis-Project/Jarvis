@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Jarvis.API
 {
@@ -14,14 +13,26 @@ namespace Jarvis.API
         /// <param name="msg">Response message</param>
         /// <param name="origin">Response origin</param>
         /// <param name="requestId">Id property of the JarvisRequest</param>
-        public static async Task SendJarvisResponse(string msg, string origin, long requestId)
+        /// <returns>A task returning whether or not the response was sent</returns>
+        public static async Task<bool> SendJarvisResponse(string msg, string origin, long requestId)
         {
             bool result = await Jarvis.Service.TrySendResponse(msg, origin, requestId);
             if (!result) Log.Warning("Failed to send response.\nRequestId: " + requestId + "\nOrigin: " + origin);
+            return result;
         }
 
-        public static async Task SendBladeRequest(string data, string origin) =>
-            throw new NotImplementedException();
+        /// <summary>
+        /// Sends a request to a blade in a BladeMsg.
+        /// </summary>
+        /// <param name="origin">The name of the blade</param>
+        /// <param name="data">The message to send</param>
+        /// <returns>Whether or not the request could be added</returns>
+        public static bool SendBladeRequest(string origin, string data)
+        {
+            bool result = Jarvis.Service.TrySendBladeRequest(origin, data);
+            if (!result) Log.Warning("Failed to send blade request.\nOrigin: " + origin);
+            return result;
+        }
 
         /// <summary>
         /// Gets all the currently unfilled requests from JarvisLinker.
@@ -29,15 +40,21 @@ namespace Jarvis.API
         /// <returns>Unfilled requests</returns>
         public static JarvisRequest[] Requests() => Jarvis.Service.GetUnfilledRequests().ToArray();
 
-        public static BladeMsg[] BladeResponses() => throw new NotImplementedException();
+        /// <summary>
+        /// Gets all current blade responses as an array.
+        /// </summary>
+        /// <returns>All blade responses</returns>
+        public static BladeMsg[] BladeResponses() => Jarvis.Service.GetBladeResponses();
 
         /// <summary>
         /// Wipes the JarvisLinker database of all requests and responses.
         /// </summary>
-        public static async Task WipeDatabase()
+        /// <returns>A task that returns whether or not the database was wiped</returns>
+        public static async Task<bool> WipeDatabase()
         {
             bool result = await Jarvis.Service.TryWipeDatabase();
             if (!result) Log.Warning("Failed to delete all items from JarvisLinker.");
+            return result;
         }
     }
 }

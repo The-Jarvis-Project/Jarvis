@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.ML;
+using System.Linq;
 
 namespace Jarvis
 {
@@ -56,13 +57,21 @@ namespace Jarvis
 
         private string requestsJson, responsesJson;
         private List<JarvisRequest> requests;
-        private readonly List<JarvisRequest> unfilledRequests;
         private List<JarvisResponse> responses;
+        private readonly List<JarvisRequest> unfilledRequests;
+
+        private string bladeCmdsJson, bladeResponsesJson;
+        private readonly HashSet<string> trackedBlades;
+        private readonly Dictionary<string, Queue<BladeMsg>> bladeCmdQueue;
+        private readonly Dictionary<string, BladeMsg> bladeCmds, bladeResponses;
 
         private static Jarvis singleton;
         private static readonly HttpClient client = new HttpClient();
-        private static readonly string requestUrl = "https://jarvislinker.azurewebsites.net/api/JarvisRequests",
-            responseUrl = "https://jarvislinker.azurewebsites.net/api/JarvisResponses";
+        private static readonly string 
+            requestUrl = "https://jarvislinker.azurewebsites.net/api/JarvisRequests",
+            responseUrl = "https://jarvislinker.azurewebsites.net/api/JarvisResponses",
+            bladeCmdURL = "https://jarvislinker.azurewebsites.net/api/BladeCommands",
+            bladeResponseURL = "https://jarvislinker.azurewebsites.net/api/BladeResponses";
 
         private readonly List<IUpdate> updateBehaviors;
         private readonly List<IWebUpdate> webBehaviors;
@@ -143,6 +152,11 @@ namespace Jarvis
             requests = new List<JarvisRequest>();
             unfilledRequests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
+
+            trackedBlades = new HashSet<string>();
+            bladeCmds = new Dictionary<string, BladeMsg>();
+            bladeResponses = new Dictionary<string, BladeMsg>();
+            bladeCmdQueue = new Dictionary<string, Queue<BladeMsg>>();
 
             Assembly[] refed = AppDomain.CurrentDomain.GetAssemblies();
             string referencedAssemblies = "Referenced Assemblies:";
@@ -291,15 +305,31 @@ namespace Jarvis
         {
             webRequestTimer.Stop();
             HttpResponseMessage requestMsg = await client.GetAsync(requestUrl),
-                responseMsg = await client.GetAsync(responseUrl);
+                responseMsg = await client.GetAsync(responseUrl),
+                bladeCmdMsg = await client.GetAsync(bladeCmdURL),
+                bladeResponseMsg = await client.GetAsync(bladeResponseURL);
             if (requestMsg.IsSuccessStatusCode && responseMsg.IsSuccessStatusCode)
             {
                 try
                 {
                     requestsJson = await requestMsg.Content.ReadAsStringAsync();
                     responsesJson = await responseMsg.Content.ReadAsStringAsync();
+                    bladeCmdsJson = await bladeCmdMsg.Content.ReadAsStringAsync();
+                    bladeResponsesJson = await bladeResponseMsg.Content.ReadAsStringAsync();
+
                     requests = JsonConvert.DeserializeObject<List<JarvisRequest>>(requestsJson);
                     responses = JsonConvert.DeserializeObject<List<JarvisResponse>>(responsesJson);
+                    List<BladeMsg> bladeCmdList = JsonConvert.DeserializeObject<List<BladeMsg>>(bladeCmdsJson),
+                        bladeResponseList = JsonConvert.DeserializeObject<List<BladeMsg>>(bladeResponsesJson);
+
+                    for (int i = 0; i < bladeCmdList.Count; i++)
+                        if (trackedBlades.Contains(bladeCmdList[i].Origin))
+                            bladeCmds[bladeCmdList[i].Origin] = bladeCmdList[i];
+                    for (int i = 0; i < bladeResponseList.Count; i++)
+                        if (trackedBlades.Contains(bladeResponseList[i].Origin))
+                            bladeResponses[bladeResponseList[i].Origin] = bladeResponseList[i];
+
+
 
                     unfilledRequests.Clear();
                     HashSet<long> filledRequests = new HashSet<long>();
@@ -320,14 +350,16 @@ namespace Jarvis
                         ex.Source + "\n\n" + ex.Data + "\n\n" + ex.StackTrace, EventLogEntryType.Error, 12);
                 }
             }
-            else eventLog.WriteEntry("Web Update Failed\nCode: " + requestMsg.StatusCode.ToString(), EventLogEntryType.Warning, 7);
+            else eventLog.WriteEntry("Web Update Failed\nCode: " + 
+                requestMsg.StatusCode.ToString(), EventLogEntryType.Warning, 7);
             webRequestTimer.Start();
         }
 
         private void LogTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             string log = "- Status Check -\nState: " + state.ToString() +
-                "\nBehaviors: " + (updateBehaviors.Count + webBehaviors.Count + startBehaviors.Count + stopBehaviors.Count) +
+                "\nBehaviors: " + (updateBehaviors.Count + webBehaviors.Count + 
+                startBehaviors.Count + stopBehaviors.Count) +
                 "\n" + requests.Count + " Requests:\n" + requestsJson +
                 "\n\n" + responses.Count + " Responses:\n" + responsesJson +
                 "\n\n(" + unfilledRequests.Count + " Unfilled Requests)";
@@ -382,7 +414,8 @@ namespace Jarvis
             /// <param name="msg">Log message</param>
             /// <param name="type">Type of log message</param>
             /// <param name="code">Number code of the log message</param>
-            public static void Log(string msg, EventLogEntryType type = EventLogEntryType.Information, int code = 8) =>
+            public static void Log(string msg, 
+                EventLogEntryType type = EventLogEntryType.Information, int code = 8) =>
                 singleton.eventLog.WriteEntry(msg, type, code);
 
             /// <summary>
@@ -441,100 +474,172 @@ namespace Jarvis
             }
 
             /// <summary>
-            /// (Used internally for hot loading custom behaviors.)
+            /// Adds a blade to the set of blades this service can communicate with.
             /// </summary>
-            public static class HotLoading
+            /// <param name="blade">The name of the blade to add</param>
+            /// <returns>Whether or not the blade could be added</returns>
+            public static bool TrackBlade(string blade)
             {
-                /// <summary>
-                /// Adds a function to the stop loop.
-                /// </summary>
-                /// <param name="name">Name of the behavior</param>
-                /// <param name="obj">The function to add</param>
-                public static void AddToStopBehaviors(string name, IStop obj)
+                if (!singleton.trackedBlades.Contains(blade))
                 {
-                    singleton.stopNames.Add(name);
-                    singleton.stopBehaviors.Add(obj);
-                    singleton.stopBehaviors.Sort(singleton.CompareBehaviors);
-                }
-
-                /// <summary>
-                /// Adds a function to the main update loop.
-                /// </summary>
-                /// <param name="name">Name of the behavior</param>
-                /// <param name="obj">The function to add</param>
-                public static void AddToUpdateBehaviors(string name, IUpdate obj)
-                {
-                    singleton.updateNames.Add(name);
-                    singleton.updateBehaviors.Add(obj);
-                    singleton.updateBehaviors.Sort(singleton.CompareBehaviors);
-                }
-
-                /// <summary>
-                /// Adds a function to the web update loop.
-                /// </summary>
-                /// <param name="name">Name of the behavior</param>
-                /// <param name="obj">The function to add</param>
-                public static void AddToWebBehaviors(string name, IWebUpdate obj)
-                {
-                    singleton.webNames.Add(name);
-                    singleton.webBehaviors.Add(obj);
-                    singleton.webBehaviors.Sort(singleton.CompareBehaviors);
-                }
-
-                /*public static void AddToWebBehaviors(string name, PropertyInfo enabled, MethodInfo method, object obj)
-                {
-                    bool isEnabled = (bool)enabled.GetValue(obj);
-                    singleton.hotWebBehaviors.Add((name, isEnabled, method, obj));
-                }*/
-
-                /// <summary>
-                /// Removes a behavior from the stop loop.
-                /// </summary>
-                /// <param name="name">The name of the behavior to remove</param>
-                public static void RemoveFromStop(string name)
-                {
-                    for (int i = 0; i < singleton.stopNames.Count; i++)
+                    singleton.trackedBlades.Add(blade);
+                    singleton.bladeCmds.Add(blade, new BladeMsg()
                     {
-                        if (singleton.stopNames[i] == name)
-                        {
-                            singleton.stopBehaviors.RemoveAt(i);
-                            singleton.stopNames.RemoveAt(i);
-                            i--;
-                        }
+                        Origin = blade,
+                        Data = "--postblade",
+                    });
+                    singleton.bladeResponses.Add(blade, new BladeMsg()
+                    {
+                        Origin = blade,
+                        Data = string.Empty,
+                    });
+                    singleton.bladeCmdQueue.Add(blade, new Queue<BladeMsg>());
+                    return true;
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Removes a blade from the set of tracked blades.
+            /// </summary>
+            /// <param name="blade">The name of the blade to remove</param>
+            /// <returns>Whether or not the blade could be removed</returns>
+            public static bool RetractBlade(string blade)
+            {
+                if (singleton.trackedBlades.Contains(blade))
+                {
+                    singleton.trackedBlades.Remove(blade);
+                    singleton.bladeCmds.Remove(blade);
+                    singleton.bladeResponses.Remove(blade);
+                    singleton.bladeCmdQueue.Remove(blade);
+                    return true;
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Gets all current blade responses in the form of an array.
+            /// </summary>
+            /// <returns>All current blade responses</returns>
+            public static BladeMsg[] GetBladeResponses() => singleton.bladeResponses.Values.ToArray();
+
+            /// <summary>
+            /// Trys to send a request to a blade.
+            /// </summary>
+            /// <param name="blade">The name of the blade to send the request to</param>
+            /// <param name="data">The message to send</param>
+            /// <returns>Whether or not the blade is in the set of tracked blades</returns>
+            public static bool TrySendBladeRequest(string blade, string data)
+            {
+                if (singleton.trackedBlades.Contains(blade))
+                {
+                    BladeMsg request = new BladeMsg
+                    {
+                        Origin = blade,
+                        Data = data
+                    };
+                    singleton.bladeCmdQueue[blade].Enqueue(request);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// (Used internally for hot loading custom behaviors.)
+        /// </summary>
+        public static class HotLoading
+        {
+            /// <summary>
+            /// Adds a function to the stop loop.
+            /// </summary>
+            /// <param name="name">Name of the behavior</param>
+            /// <param name="obj">The function to add</param>
+            public static void AddToStopBehaviors(string name, IStop obj)
+            {
+                singleton.stopNames.Add(name);
+                singleton.stopBehaviors.Add(obj);
+                singleton.stopBehaviors.Sort(singleton.CompareBehaviors);
+            }
+
+            /// <summary>
+            /// Adds a function to the main update loop.
+            /// </summary>
+            /// <param name="name">Name of the behavior</param>
+            /// <param name="obj">The function to add</param>
+            public static void AddToUpdateBehaviors(string name, IUpdate obj)
+            {
+                singleton.updateNames.Add(name);
+                singleton.updateBehaviors.Add(obj);
+                singleton.updateBehaviors.Sort(singleton.CompareBehaviors);
+            }
+
+            /// <summary>
+            /// Adds a function to the web update loop.
+            /// </summary>
+            /// <param name="name">Name of the behavior</param>
+            /// <param name="obj">The function to add</param>
+            public static void AddToWebBehaviors(string name, IWebUpdate obj)
+            {
+                singleton.webNames.Add(name);
+                singleton.webBehaviors.Add(obj);
+                singleton.webBehaviors.Sort(singleton.CompareBehaviors);
+            }
+
+            /*public static void AddToWebBehaviors(string name, 
+             * PropertyInfo enabled, MethodInfo method, object obj)
+            {
+                bool isEnabled = (bool)enabled.GetValue(obj);
+                singleton.hotWebBehaviors.Add((name, isEnabled, method, obj));
+            }*/
+
+            /// <summary>
+            /// Removes a behavior from the stop loop.
+            /// </summary>
+            /// <param name="name">The name of the behavior to remove</param>
+            public static void RemoveFromStop(string name)
+            {
+                for (int i = 0; i < singleton.stopNames.Count; i++)
+                {
+                    if (singleton.stopNames[i] == name)
+                    {
+                        singleton.stopBehaviors.RemoveAt(i);
+                        singleton.stopNames.RemoveAt(i);
+                        i--;
                     }
                 }
+            }
 
-                /// <summary>
-                /// Removes a behavior from the update loop.
-                /// </summary>
-                /// <param name="name">The name of the behavior to remove</param>
-                public static void RemoveFromUpdate(string name)
+            /// <summary>
+            /// Removes a behavior from the update loop.
+            /// </summary>
+            /// <param name="name">The name of the behavior to remove</param>
+            public static void RemoveFromUpdate(string name)
+            {
+                for (int i = 0; i < singleton.updateNames.Count; i++)
                 {
-                    for (int i = 0; i < singleton.updateNames.Count; i++)
+                    if (singleton.updateNames[i] == name)
                     {
-                        if (singleton.updateNames[i] == name)
-                        {
-                            singleton.updateBehaviors.RemoveAt(i);
-                            singleton.updateNames.RemoveAt(i);
-                            i--;
-                        }
+                        singleton.updateBehaviors.RemoveAt(i);
+                        singleton.updateNames.RemoveAt(i);
+                        i--;
                     }
                 }
+            }
 
-                /// <summary>
-                /// Removes a behavior from the web update loop.
-                /// </summary>
-                /// <param name="name">The name of the behavior to remove</param>
-                public static void RemoveFromWeb(string name)
+            /// <summary>
+            /// Removes a behavior from the web update loop.
+            /// </summary>
+            /// <param name="name">The name of the behavior to remove</param>
+            public static void RemoveFromWeb(string name)
+            {
+                for (int i = 0; i < singleton.webNames.Count; i++)
                 {
-                    for (int i = 0; i < singleton.webNames.Count; i++)
+                    if (singleton.webNames[i] == name)
                     {
-                        if (singleton.webNames[i] == name)
-                        {
-                            singleton.webBehaviors.RemoveAt(i);
-                            singleton.webNames.RemoveAt(i);
-                            i--;
-                        }
+                        singleton.webBehaviors.RemoveAt(i);
+                        singleton.webNames.RemoveAt(i);
+                        i--;
                     }
                 }
             }
