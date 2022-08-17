@@ -24,13 +24,13 @@ namespace Jarvis.API
         /// <summary>
         /// Sends a command to a blade in a BladeMsg.
         /// </summary>
-        /// <param name="origin">The name of the blade</param>
+        /// <param name="blade">The name of the blade</param>
         /// <param name="data">The message to send</param>
         /// <returns>Whether or not the command could be added</returns>
-        public static bool SendBladeCommand(string origin, string data)
+        public static bool SendBladeCommand(string blade, string data)
         {
-            bool result = Jarvis.Service.TrySendBladeCommand(origin, data);
-            if (!result) Log.Warning("Failed to send blade command.\nOrigin: " + origin);
+            bool result = Jarvis.Service.TrySendBladeCommand(blade, data);
+            if (!result) Log.Warning("Failed to send blade command.\nOrigin: " + blade);
             return result;
         }
 
@@ -56,5 +56,15 @@ namespace Jarvis.API
             if (!result) Log.Warning("Failed to delete all items from JarvisLinker.");
             return result;
         }
+
+        /// <summary>
+        /// Deletes blade commands and responses.
+        /// </summary>
+        /// <param name="blade">The blade to delete from</param>
+        /// <param name="cmd">Whether or not to delete the command</param>
+        /// <param name="response">Whether or not to delete the response</param>
+        /// <returns>A task that specifies whether or not the messages were deleted</returns>
+        public static async Task<bool> ConsumeBladeResponse(string blade, bool cmd = true, bool response = true) =>
+            await Jarvis.Service.ConsumeBladeMessages(blade, cmd, response);
     }
 }

@@ -323,11 +323,25 @@ namespace Jarvis
                         bladeResponseList = JsonConvert.DeserializeObject<List<BladeMsg>>(bladeResponsesJson);
 
                     for (int i = 0; i < bladeCmdList.Count; i++)
+                    {
                         if (trackedBlades.Contains(bladeCmdList[i].Origin))
                             bladeCmds[bladeCmdList[i].Origin] = bladeCmdList[i];
+                        else
+                        {
+                            Service.TrackBlade(bladeCmdList[i].Origin);
+                            bladeCmds[bladeCmdList[i].Origin] = bladeCmdList[i];
+                        }
+                    }
                     for (int i = 0; i < bladeResponseList.Count; i++)
+                    {
                         if (trackedBlades.Contains(bladeResponseList[i].Origin))
                             bladeResponses[bladeResponseList[i].Origin] = bladeResponseList[i];
+                        else
+                        {
+                            Service.TrackBlade(bladeResponseList[i].Origin);
+                            bladeResponses[bladeResponseList[i].Origin] = bladeResponseList[i];
+                        }
+                    }
 
 
 
@@ -401,6 +415,38 @@ namespace Jarvis
                 if (!success) isSuccess = false;
             }
             return isSuccess;
+        }
+
+        private async Task<bool> SendBladeCommand(string origin, string data)
+        {
+            BladeMsg dto = new BladeMsg
+            {
+                Origin = origin,
+                Data = data,
+            };
+            string json = JsonConvert.SerializeObject(dto);
+            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+            return (await client.PostAsync(bladeCmdURL, jsonContent)).IsSuccessStatusCode;
+        }
+
+        private async Task<bool> DeleteBladeCommand(string blade)
+        {
+            if (trackedBlades.Contains(blade))
+            {
+                string delUrl = bladeCmdURL + "/" + blade;
+                return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
+            }
+            return false;
+        }
+
+        private async Task<bool> DeleteBladeResponse(string blade)
+        {
+            if (trackedBlades.Contains(blade))
+            {
+                string delUrl = bladeResponseURL + "/" + blade;
+                return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
+            }
+            return false;
         }
 
         /// <summary>
@@ -542,6 +588,24 @@ namespace Jarvis
                     return true;
                 }
                 return false;
+            }
+
+            /// <summary>
+            /// Deletes blade commands and responses.
+            /// </summary>
+            /// <param name="blade">The blade to delete from</param>
+            /// <param name="cmd">Whether or not to delete the command</param>
+            /// <param name="response">Whether or not to delete the response</param>
+            /// <returns>A task that specifies whether or not the messages were deleted</returns>
+            public static async Task<bool> ConsumeBladeMessages(string blade, bool cmd, bool response)
+            {
+                bool delCmd, delResponse;
+                if (cmd) delCmd = await singleton.DeleteBladeCommand(blade);
+                else delCmd = true;
+
+                if (response) delResponse = await singleton.DeleteBladeResponse(blade);
+                else delResponse = true;
+                return delCmd && delResponse;
             }
         }
 

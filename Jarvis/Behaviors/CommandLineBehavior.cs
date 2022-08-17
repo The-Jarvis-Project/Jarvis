@@ -37,6 +37,7 @@ namespace Jarvis.Behaviors
         {
             JarvisRequest[] requests = ComSystem.Requests();
             BladeMsg[] bladeResponses = ComSystem.BladeResponses();
+            Log.Warning("Responses: " + bladeResponses.Length);
             for (int i = 0; i < requests.Length; i++)
                 if (requests[i].Request.StartsWith("--"))
                     ProcessCmdLine(GetCmdLine(requests[i].Request), requests[i].Id);
@@ -60,6 +61,7 @@ namespace Jarvis.Behaviors
 
         private async void ProcessCmdLine(CommandLine cmd, long requestId, bool blade = false)
         {
+            Log.Warning("Cmd: " + cmd.Command.ToString());
             if (cmd.Command == Command.kill)
             {
                 await ComSystem.SendJarvisResponse("[kill] Killing Jarvis service and wiping database",
@@ -116,7 +118,7 @@ namespace Jarvis.Behaviors
                 }
             }
             else if (cmd.Command == Command.wipe) await ComSystem.WipeDatabase();
-            else if (cmd.Command == Command.postblade)
+            else if (cmd.Command == Command.postblade && blade)
             {
                 if (cmd.Args.Length == 1)
                 {
