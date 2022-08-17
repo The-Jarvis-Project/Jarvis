@@ -166,6 +166,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\BladeInfo.cs" />
     <Compile Include="API\BladeMsg.cs" />
     <Compile Include="API\ComSystem.cs" />
     <Compile Include="API\FileSystem.cs" />

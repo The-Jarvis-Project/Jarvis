@@ -61,7 +61,7 @@ namespace Jarvis
         private readonly List<JarvisRequest> unfilledRequests;
 
         private string bladeCmdsJson, bladeResponsesJson;
-        private readonly HashSet<string> trackedBlades;
+        private readonly Dictionary<string, BladeInfo> trackedBlades;
         private readonly Dictionary<string, Queue<BladeMsg>> bladeCmdQueue;
         private readonly Dictionary<string, BladeMsg> bladeCmds, bladeResponses;
 
@@ -153,7 +153,7 @@ namespace Jarvis
             unfilledRequests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
 
-            trackedBlades = new HashSet<string>();
+            trackedBlades = new Dictionary<string, BladeInfo>();
             bladeCmds = new Dictionary<string, BladeMsg>();
             bladeResponses = new Dictionary<string, BladeMsg>();
             bladeCmdQueue = new Dictionary<string, Queue<BladeMsg>>();
@@ -325,20 +325,9 @@ namespace Jarvis
                     bladeCmds.Clear();
                     bladeResponses.Clear();
                     for (int i = 0; i < bladeCmdList.Count; i++)
-                    {
-                        Service.TrackBlade(bladeCmdList[i].Origin);
                         bladeCmds.Add(bladeCmdList[i].Origin, bladeCmdList[i]);
-                    }
                     for (int i = 0; i < bladeResponseList.Count; i++)
-                    {
-                        Service.TrackBlade(bladeResponseList[i].Origin);
                         bladeResponses.Add(bladeResponseList[i].Origin, bladeResponseList[i]);
-                    }
-
-                    foreach (string blade in bladeCmdQueue.Keys)
-                        if (trackedBlades.Contains(blade) && !bladeCmds.ContainsKey(blade)
-                            && bladeCmdQueue[blade].Count > 0)
-                            await SendBladeCommand(blade, bladeCmdQueue[blade].Dequeue().Data);
 
                     unfilledRequests.Clear();
                     HashSet<long> filledRequests = new HashSet<long>();
@@ -352,6 +341,11 @@ namespace Jarvis
                     for (int i = 0; i < webBehaviors.Count; i++)
                         if (webBehaviors[i].Enabled)
                             webBehaviors[i].WebUpdate();
+
+                    foreach (string blade in bladeCmdQueue.Keys)
+                        if (trackedBlades.ContainsKey(blade) && !bladeCmds.ContainsKey(blade)
+                            && bladeCmdQueue[blade].Count > 0)
+                            await SendBladeCommand(blade, bladeCmdQueue[blade].Dequeue().Data);
                 }
                 catch (Exception ex)
                 {
@@ -426,7 +420,7 @@ namespace Jarvis
 
         private async Task<bool> DeleteBladeCommand(string blade)
         {
-            if (trackedBlades.Contains(blade))
+            if (trackedBlades.ContainsKey(blade))
             {
                 string delUrl = bladeCmdURL + "/" + blade;
                 return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
@@ -436,7 +430,7 @@ namespace Jarvis
 
         private async Task<bool> DeleteBladeResponse(string blade)
         {
-            if (trackedBlades.Contains(blade))
+            if (trackedBlades.ContainsKey(blade))
             {
                 string delUrl = bladeResponseURL + "/" + blade;
                 return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
@@ -519,11 +513,16 @@ namespace Jarvis
             /// </summary>
             /// <param name="blade">The name of the blade to add</param>
             /// <returns>Whether or not the blade could be added</returns>
-            public static bool TrackBlade(string blade)
+            public static bool TrackBlade(string blade, string nickname)
             {
-                if (!singleton.trackedBlades.Contains(blade))
+                if (!singleton.trackedBlades.ContainsKey(blade))
                 {
-                    singleton.trackedBlades.Add(blade);
+                    singleton.trackedBlades.Add(blade, new BladeInfo
+                    { 
+                        name = blade,
+                        nickname = nickname,
+                        active = true,
+                    });
                     singleton.bladeCmdQueue.Add(blade, new Queue<BladeMsg>());
                     return true;
                 }
@@ -537,7 +536,7 @@ namespace Jarvis
             /// <returns>Whether or not the blade could be removed</returns>
             public static bool RetractBlade(string blade)
             {
-                if (singleton.trackedBlades.Contains(blade))
+                if (singleton.trackedBlades.ContainsKey(blade))
                 {
                     singleton.trackedBlades.Remove(blade);
                     singleton.bladeCmds.Remove(blade);
@@ -562,7 +561,7 @@ namespace Jarvis
             /// <returns>Whether or not the blade is in the set of tracked blades</returns>
             public static bool TrySendBladeCommand(string blade, string data)
             {
-                if (singleton.trackedBlades.Contains(blade))
+                if (singleton.trackedBlades.ContainsKey(blade))
                 {
                     BladeMsg command = new BladeMsg
                     {

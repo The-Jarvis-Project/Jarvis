@@ -118,11 +118,12 @@ namespace Jarvis.Behaviors
             else if (cmd.Command == Command.wipe) await ComSystem.WipeDatabase();
             else if (cmd.Command == Command.postblade && !string.IsNullOrEmpty(blade))
             {
-                if (cmd.Args.Length == 1)
+                if (cmd.Args.Length == 2)
                 {
-                    Log.Warning("Posted Blade " + cmd.Args[0]);
+                    bool successful = Jarvis.Service.TrackBlade(cmd.Args[0], cmd.Args[1]);
+                    Log.Info("Blade: " + cmd.Args[0] + "\nPosted: " + successful);
                     await ComSystem.ConsumeBladeMsgs(blade, true, true);
-                    ComSystem.QueueBladeCommand(blade, "blade was posted");
+                    ComSystem.QueueBladeCommand(blade, "posted blade: " + successful);
                 }
             }
         }
