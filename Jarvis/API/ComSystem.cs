@@ -22,12 +22,12 @@ namespace Jarvis.API
         }
 
         /// <summary>
-        /// Sends a command to a blade in a BladeMsg.
+        /// Queues a command to send to a blade via a BladeMsg.
         /// </summary>
         /// <param name="blade">The name of the blade</param>
         /// <param name="data">The message to send</param>
         /// <returns>Whether or not the command could be added</returns>
-        public static bool SendBladeCommand(string blade, string data)
+        public static bool QueueBladeCommand(string blade, string data)
         {
             bool result = Jarvis.Service.TrySendBladeCommand(blade, data);
             if (!result) Log.Warning("Failed to send blade command.\nOrigin: " + blade);

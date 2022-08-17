@@ -335,7 +335,10 @@ namespace Jarvis
                         bladeResponses.Add(bladeResponseList[i].Origin, bladeResponseList[i]);
                     }
 
-
+                    foreach (string blade in bladeCmdQueue.Keys)
+                        if (trackedBlades.Contains(blade) && !bladeCmds.ContainsKey(blade)
+                            && bladeCmdQueue[blade].Count > 0)
+                            await SendBladeCommand(blade, bladeCmdQueue[blade].Dequeue().Data);
 
                     unfilledRequests.Clear();
                     HashSet<long> filledRequests = new HashSet<long>();
