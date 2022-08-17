@@ -51,8 +51,8 @@ namespace Jarvis
     /// </summary>
     public partial class Jarvis : ServiceBase
     {
-        private const int updateMs = 100, logMs = 90000, webRequestMs = 2000;
-        private Timer updateTimer, logTimer, webRequestTimer;
+        private const double updateMs = 100, logMs = 90000, webRequestMs = 2000, bladeTrackMs = 200000;
+        private Timer updateTimer, logTimer, webRequestTimer, bladeTrackTimer;
         private ServiceState state;
 
         private string requestsJson, responsesJson;
@@ -199,12 +199,15 @@ namespace Jarvis
             updateTimer = new Timer(updateMs);
             logTimer = new Timer(logMs);
             webRequestTimer = new Timer(webRequestMs);
+            bladeTrackTimer = new Timer(bladeTrackMs);
             updateTimer.Start();
             logTimer.Start();
             webRequestTimer.Start();
+            bladeTrackTimer.Start();
             updateTimer.Elapsed += UpdateTimer_Elapsed;
             logTimer.Elapsed += LogTimer_Elapsed;
             webRequestTimer.Elapsed += WebRequestTimer_Elapsed;
+            bladeTrackTimer.Elapsed += BladeTrackTimer_Elapsed;
             eventLog.WriteEntry("Started", EventLogEntryType.Information, 1);
 
             state = ServiceState.SERVICE_RUNNING;
@@ -225,6 +228,7 @@ namespace Jarvis
             updateTimer.Dispose();
             logTimer.Dispose();
             webRequestTimer.Dispose();
+            bladeTrackTimer.Dispose();
 
             try
             {
@@ -259,6 +263,7 @@ namespace Jarvis
             updateTimer.Stop();
             logTimer.Stop();
             webRequestTimer.Stop();
+            bladeTrackTimer.Stop();
             eventLog.WriteEntry("Paused", EventLogEntryType.Information, 3);
 
             state = ServiceState.SERVICE_PAUSED;
@@ -279,6 +284,7 @@ namespace Jarvis
             updateTimer.Start();
             logTimer.Start();
             webRequestTimer.Start();
+            bladeTrackTimer.Start();
             eventLog.WriteEntry("Unpaused", EventLogEntryType.Information, 4);
 
             state = ServiceState.SERVICE_RUNNING;
@@ -327,7 +333,16 @@ namespace Jarvis
                     for (int i = 0; i < bladeCmdList.Count; i++)
                         bladeCmds.Add(bladeCmdList[i].Origin, bladeCmdList[i]);
                     for (int i = 0; i < bladeResponseList.Count; i++)
-                        bladeResponses.Add(bladeResponseList[i].Origin, bladeResponseList[i]);
+                    {
+                        string origin = bladeResponseList[i].Origin;
+                        bladeResponses.Add(origin, bladeResponseList[i]);
+                        if (trackedBlades.ContainsKey(origin))
+                        {
+                            BladeInfo tracked = trackedBlades[origin];
+                            tracked.active = true;
+                            trackedBlades[origin] = tracked;
+                        }
+                    }
 
                     unfilledRequests.Clear();
                     HashSet<long> filledRequests = new HashSet<long>();
@@ -358,14 +373,37 @@ namespace Jarvis
             webRequestTimer.Start();
         }
 
+        private void BladeTrackTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            foreach (BladeInfo blade in trackedBlades.Values)
+            {
+                if (!blade.active)
+                {
+                    bool removed = Service.RetractBlade(blade.name);
+                    Log.Info("Lost blade: " + blade.name + "\nRemoved: " + removed);
+                }
+            }
+            foreach (KeyValuePair<string, BladeInfo> item in trackedBlades)
+            {
+                BladeInfo blade = item.Value;
+                blade.active = false;
+                trackedBlades[item.Key] = blade;
+            }
+        }
+
         private void LogTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            string blades = "\n\nBlades:";
+            foreach (BladeInfo blade in trackedBlades.Values)
+                blades += "\n" + blade.nickname + " | active: " + blade.active;
+
             string log = "- Status Check -\nState: " + state.ToString() +
                 "\nBehaviors: " + (updateBehaviors.Count + webBehaviors.Count + 
                 startBehaviors.Count + stopBehaviors.Count) +
                 "\n" + requests.Count + " Requests:\n" + requestsJson +
                 "\n\n" + responses.Count + " Responses:\n" + responsesJson +
-                "\n\n(" + unfilledRequests.Count + " Unfilled Requests)";
+                "\n\n(" + unfilledRequests.Count + " Unfilled Requests)" +
+                blades;
             eventLog.WriteEntry(log, EventLogEntryType.Information, 5);
         }
 
