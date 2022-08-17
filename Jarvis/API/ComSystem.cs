@@ -22,15 +22,15 @@ namespace Jarvis.API
         }
 
         /// <summary>
-        /// Sends a request to a blade in a BladeMsg.
+        /// Sends a command to a blade in a BladeMsg.
         /// </summary>
         /// <param name="origin">The name of the blade</param>
         /// <param name="data">The message to send</param>
-        /// <returns>Whether or not the request could be added</returns>
-        public static bool SendBladeRequest(string origin, string data)
+        /// <returns>Whether or not the command could be added</returns>
+        public static bool SendBladeCommand(string origin, string data)
         {
-            bool result = Jarvis.Service.TrySendBladeRequest(origin, data);
-            if (!result) Log.Warning("Failed to send blade request.\nOrigin: " + origin);
+            bool result = Jarvis.Service.TrySendBladeCommand(origin, data);
+            if (!result) Log.Warning("Failed to send blade command.\nOrigin: " + origin);
             return result;
         }
 

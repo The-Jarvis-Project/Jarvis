@@ -36,14 +36,18 @@ namespace Jarvis.Behaviors
         public void WebUpdate()
         {
             JarvisRequest[] requests = ComSystem.Requests();
+            BladeMsg[] bladeResponses = ComSystem.BladeResponses();
             for (int i = 0; i < requests.Length; i++)
                 if (requests[i].Request.StartsWith("--"))
-                    ProcessCommandLine(GetCommandLine(requests[i]), requests[i].Id);
+                    ProcessCmdLine(GetCmdLine(requests[i].Request), requests[i].Id);
+            for (int i = 0; i < bladeResponses.Length; i++)
+                if (bladeResponses[i].Data.StartsWith("--"))
+                    ProcessCmdLine(GetCmdLine(bladeResponses[i].Data), -1, true);
         }
 
-        private CommandLine GetCommandLine(JarvisRequest request)
+        private CommandLine GetCmdLine(string text)
         {
-            string[] split = request.Request.Split('?');
+            string[] split = text.Split('?');
             for (int i = 0; i < split.Length; i++) split[i] = split[i].Trim();
 
             Command cmd;
@@ -54,7 +58,7 @@ namespace Jarvis.Behaviors
             return new CommandLine(cmd, args);
         }
 
-        private async void ProcessCommandLine(CommandLine cmd, long requestId)
+        private async void ProcessCmdLine(CommandLine cmd, long requestId, bool blade = false)
         {
             if (cmd.Command == Command.kill)
             {
@@ -112,6 +116,13 @@ namespace Jarvis.Behaviors
                 }
             }
             else if (cmd.Command == Command.wipe) await ComSystem.WipeDatabase();
+            else if (cmd.Command == Command.postblade)
+            {
+                if (cmd.Args.Length == 1)
+                {
+                    Log.Warning("Posted Blade " + cmd.Args[0]);
+                }
+            }
         }
     }
 }

@@ -524,21 +524,21 @@ namespace Jarvis
             public static BladeMsg[] GetBladeResponses() => singleton.bladeResponses.Values.ToArray();
 
             /// <summary>
-            /// Trys to send a request to a blade.
+            /// Trys to send a command to a blade.
             /// </summary>
-            /// <param name="blade">The name of the blade to send the request to</param>
+            /// <param name="blade">The name of the blade to send the command to</param>
             /// <param name="data">The message to send</param>
             /// <returns>Whether or not the blade is in the set of tracked blades</returns>
-            public static bool TrySendBladeRequest(string blade, string data)
+            public static bool TrySendBladeCommand(string blade, string data)
             {
                 if (singleton.trackedBlades.Contains(blade))
                 {
-                    BladeMsg request = new BladeMsg
+                    BladeMsg command = new BladeMsg
                     {
                         Origin = blade,
                         Data = data
                     };
-                    singleton.bladeCmdQueue[blade].Enqueue(request);
+                    singleton.bladeCmdQueue[blade].Enqueue(command);
                     return true;
                 }
                 return false;
