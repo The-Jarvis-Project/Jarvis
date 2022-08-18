@@ -66,5 +66,7 @@ namespace Jarvis.API
         /// <returns>A task that specifies whether or not the messages were deleted</returns>
         public static async Task<bool> ConsumeBladeMsgs(string blade, bool cmd = true, bool response = true) =>
             await Jarvis.Service.ConsumeBladeMessages(blade, cmd, response);
+
+        public static bool ConsumeRequest(long requestId) => Jarvis.Service.ConsumeRequest(requestId);
     }
 }

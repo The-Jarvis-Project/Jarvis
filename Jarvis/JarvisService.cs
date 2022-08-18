@@ -58,7 +58,7 @@ namespace Jarvis
         private string requestsJson, responsesJson;
         private List<JarvisRequest> requests;
         private List<JarvisResponse> responses;
-        private readonly List<JarvisRequest> unfilledRequests;
+        private readonly HashSet<long> consumedRequestIds;
 
         private string bladeCmdsJson, bladeResponsesJson;
         private readonly Dictionary<string, BladeInfo> trackedBlades;
@@ -150,8 +150,8 @@ namespace Jarvis
             eventLog.WriteEntry("Initialized Behaviors: " + behaviorsText, EventLogEntryType.Information, 6);
 
             requests = new List<JarvisRequest>();
-            unfilledRequests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
+            consumedRequestIds = new HashSet<long>();
 
             trackedBlades = new Dictionary<string, BladeInfo>();
             bladeCmds = new Dictionary<string, BladeMsg>();
@@ -344,15 +344,6 @@ namespace Jarvis
                         }
                     }
 
-                    unfilledRequests.Clear();
-                    HashSet<long> filledRequests = new HashSet<long>();
-                    for (int i = 0; i < responses.Count; i++)
-                        if (!filledRequests.Contains(responses[i].RequestId))
-                            filledRequests.Add(responses[i].RequestId);
-                    for (int i = 0; i < requests.Count; i++)
-                        if (!filledRequests.Contains(requests[i].Id))
-                            unfilledRequests.Add(requests[i]);
-
                     for (int i = 0; i < webBehaviors.Count; i++)
                         if (webBehaviors[i].Enabled)
                             webBehaviors[i].WebUpdate();
@@ -402,7 +393,6 @@ namespace Jarvis
                 startBehaviors.Count + stopBehaviors.Count) +
                 "\n" + requests.Count + " Requests:\n" + requestsJson +
                 "\n\n" + responses.Count + " Responses:\n" + responsesJson +
-                "\n\n(" + unfilledRequests.Count + " Unfilled Requests)" +
                 blades;
             eventLog.WriteEntry(log, EventLogEntryType.Information, 5);
         }
@@ -500,7 +490,14 @@ namespace Jarvis
             /// Gets the JarvisRequest objects from the last API ping that haven't been responded too.
             /// </summary>
             /// <returns>Current JarvisRequest list</returns>
-            public static List<JarvisRequest> GetUnfilledRequests() => singleton.unfilledRequests;
+            public static List<JarvisRequest> GetUnfilledRequests()
+            {
+                List<JarvisRequest> unfilledRequests = new List<JarvisRequest>();
+                for (int i = 0; i < singleton.requests.Count; i++)
+                    if (!singleton.consumedRequestIds.Contains(singleton.requests[i].Id))
+                        unfilledRequests.Add(singleton.requests[i]);
+                return unfilledRequests;
+            }
 
             /// <summary>
             /// Trys to send a response for a specified JarvisRequest.
@@ -511,27 +508,8 @@ namespace Jarvis
             /// <returns>If the reponse was sent successfully</returns>
             public static async Task<bool> TrySendResponse(string data, string origin, long requestId)
             {
-                bool canSend = false;
-                int requestIndex = -1;
-                for (int i = 0; i < singleton.unfilledRequests.Count; i++)
-                {
-                    if (singleton.unfilledRequests[i].Id == requestId)
-                    {
-                        canSend = true;
-                        requestIndex = i;
-                        break;
-                    }
-                }
-
-                if (canSend)
-                {
-                    bool completed = await singleton.SendResponse(data, origin, requestId);
-                    if (completed)
-                    {
-                        singleton.unfilledRequests.RemoveAt(requestIndex);
-                        return true;
-                    }
-                }
+                if (!singleton.consumedRequestIds.Contains(requestId))
+                    return await singleton.SendResponse(data, origin, requestId);
                 return false;
             }
 
@@ -628,6 +606,16 @@ namespace Jarvis
                 if (response) delResponse = await singleton.DeleteBladeResponse(blade);
                 else delResponse = true;
                 return delCmd && delResponse;
+            }
+
+            public static bool ConsumeRequest(long requestId)
+            {
+                if (!singleton.consumedRequestIds.Contains(requestId))
+                {
+                    singleton.consumedRequestIds.Add(requestId);
+                    return true;
+                }
+                return false;
             }
         }
 
