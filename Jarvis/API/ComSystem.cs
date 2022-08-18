@@ -67,6 +67,11 @@ namespace Jarvis.API
         public static async Task<bool> ConsumeBladeMsgs(string blade, bool cmd = true, bool response = true) =>
             await Jarvis.Service.ConsumeBladeMessages(blade, cmd, response);
 
+        /// <summary>
+        /// Marks a JarvisRequest as already utilized.
+        /// </summary>
+        /// <param name="requestId">The requestId to consume</param>
+        /// <returns>Whether or not the request was already consumed</returns>
         public static bool ConsumeRequest(long requestId) => Jarvis.Service.ConsumeRequest(requestId);
     }
 }

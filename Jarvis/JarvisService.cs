@@ -608,6 +608,11 @@ namespace Jarvis
                 return delCmd && delResponse;
             }
 
+            /// <summary>
+            /// Consumes a request making sure no future web updates look at it.
+            /// </summary>
+            /// <param name="requestId">The requestId to consume</param>
+            /// <returns>Whether or not the request was already consumed</returns>
             public static bool ConsumeRequest(long requestId)
             {
                 if (!singleton.consumedRequestIds.Contains(requestId))
