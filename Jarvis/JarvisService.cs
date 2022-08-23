@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.ML;
 using System.Linq;
+using System.Numerics;
 
 namespace Jarvis
 {
@@ -51,7 +52,7 @@ namespace Jarvis
     /// </summary>
     public partial class Jarvis : ServiceBase
     {
-        private const double updateMs = 100, logMs = 90000, webRequestMs = 2000, bladeTrackMs = 200000;
+        private const double updateMs = 100, logMs = 90000, webRequestMs = 2000, bladeTrackMs = 30000;
         private Timer updateTimer, logTimer, webRequestTimer, bladeTrackTimer;
         private ServiceState state;
 
@@ -331,7 +332,12 @@ namespace Jarvis
                     bladeCmds.Clear();
                     bladeResponses.Clear();
                     for (int i = 0; i < bladeCmdList.Count; i++)
-                        bladeCmds.Add(bladeCmdList[i].Origin, bladeCmdList[i]);
+                    {
+                        string origin = bladeCmdList[i].Origin;
+                        bladeCmds.Add(origin, bladeCmdList[i]);
+                        if (!trackedBlades.ContainsKey(origin))
+                            await Service.ConsumeBladeMessages(origin, true, false);
+                    }
                     for (int i = 0; i < bladeResponseList.Count; i++)
                     {
                         string origin = bladeResponseList[i].Origin;
@@ -448,22 +454,14 @@ namespace Jarvis
 
         private async Task<bool> DeleteBladeCommand(string blade)
         {
-            if (trackedBlades.ContainsKey(blade))
-            {
-                string delUrl = bladeCmdURL + "/" + blade;
-                return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
-            }
-            return false;
+            string delUrl = bladeCmdURL + "/" + blade;
+            return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
         }
 
         private async Task<bool> DeleteBladeResponse(string blade)
         {
-            if (trackedBlades.ContainsKey(blade))
-            {
-                string delUrl = bladeResponseURL + "/" + blade;
-                return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
-            }
-            return false;
+            string delUrl = bladeResponseURL + "/" + blade;
+            return (await client.DeleteAsync(delUrl)).IsSuccessStatusCode;
         }
 
         /// <summary>
@@ -554,6 +552,7 @@ namespace Jarvis
             {
                 if (singleton.trackedBlades.ContainsKey(blade))
                 {
+                    _ = ConsumeBladeMessages(blade, true, true);
                     singleton.trackedBlades.Remove(blade);
                     singleton.bladeCmds.Remove(blade);
                     singleton.bladeResponses.Remove(blade);
