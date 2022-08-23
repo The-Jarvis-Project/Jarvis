@@ -186,6 +186,7 @@
     <Compile Include="API\Utilities.cs" />
     <Compile Include="Behaviors\CommandLineBehavior.cs" />
     <Compile Include="Behaviors\HappinessBehavior.cs" />
+    <Compile Include="Behaviors\RequestConsumeBehavior.cs" />
     <Compile Include="Behaviors\TestBehavior.cs" />
     <Compile Include="Behaviors\TestJarvisWebBehavior.cs" />
     <Compile Include="API\JarvisRequest.cs" />
