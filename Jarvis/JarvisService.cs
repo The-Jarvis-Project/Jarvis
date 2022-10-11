@@ -149,10 +149,6 @@ namespace Jarvis
             startBehaviors.Sort(CompareBehaviors);
             stopBehaviors.Sort(CompareBehaviors);
             eventLog.WriteEntry("Initialized Behaviors: " + behaviorsText, EventLogEntryType.Information, 6);
-            for (int i = 0; i < webBehaviors.Count; i++)
-            {
-                Log.Warning(webBehaviors[i].Priority.ToString());
-            }
 
             requests = new List<JarvisRequest>();
             responses = new List<JarvisResponse>();
@@ -571,6 +567,12 @@ namespace Jarvis
             /// </summary>
             /// <returns>All current blade responses</returns>
             public static BladeMsg[] GetBladeResponses() => singleton.bladeResponses.Values.ToArray();
+
+            /// <summary>
+            /// Gets all currently tracked blades.
+            /// </summary>
+            /// <returns>The BladeInfo struct representing a tracked blade</returns>
+            public static BladeInfo[] TrackedBlades() => singleton.trackedBlades.Values.ToArray();
 
             /// <summary>
             /// Trys to send a command to a blade.

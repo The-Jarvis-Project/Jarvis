@@ -47,6 +47,30 @@ namespace Jarvis.API
         public static BladeMsg[] BladeResponses() => Jarvis.Service.GetBladeResponses();
 
         /// <summary>
+        /// Gets all currently tracked blade nicknames.
+        /// </summary>
+        /// <returns>A list of blade nicknames</returns>
+        public static string[] BladeNicknames()
+        {
+            BladeInfo[] blades = Jarvis.Service.TrackedBlades();
+            string[] bladeNicknames = new string[blades.Length];
+            for (int i = 0; i < blades.Length; i++) bladeNicknames[i] = blades[i].nickname;
+            return bladeNicknames;
+        }
+
+        /// <summary>
+        /// Gets all currently tracked blade names.
+        /// </summary>
+        /// <returns>A list of blade names</returns>
+        public static string[] BladeNames()
+        {
+            BladeInfo[] blades = Jarvis.Service.TrackedBlades();
+            string[] bladeNames = new string[blades.Length];
+            for (int i = 0; i < blades.Length; i++) bladeNames[i] = blades[i].name;
+            return bladeNames;
+        }
+
+        /// <summary>
         /// Wipes the JarvisLinker database of all requests and responses.
         /// </summary>
         /// <returns>A task that returns whether or not the database was wiped</returns>
